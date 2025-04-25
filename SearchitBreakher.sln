@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SearchitBreakher", "Searchi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SearchitTest", "SearchitTest\SearchitTest.csproj", "{01C75139-1086-4A2B-8F7E-B4A573E4E9C5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SearchitLibrary", "SearchitLibrary\SearchitLibrary.csproj", "{563F27A1-0EB2-4EA1-B306-EFF81A3E950A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{01C75139-1086-4A2B-8F7E-B4A573E4E9C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{01C75139-1086-4A2B-8F7E-B4A573E4E9C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{01C75139-1086-4A2B-8F7E-B4A573E4E9C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{563F27A1-0EB2-4EA1-B306-EFF81A3E950A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{563F27A1-0EB2-4EA1-B306-EFF81A3E950A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{563F27A1-0EB2-4EA1-B306-EFF81A3E950A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{563F27A1-0EB2-4EA1-B306-EFF81A3E950A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

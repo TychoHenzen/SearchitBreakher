@@ -1,28 +1,35 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Instructions for Claude Code when working with this repository.
 
 ## Build Commands
-- Build project: `dotnet build`
-- Run project: `dotnet run --project SearchitBreakher`
-- Package content: `dotnet mgcb-editor`
-- Clean solution: `dotnet clean`
+- Build: `cmd.exe /c dotnet build`
+- Run: `cmd.exe /c dotnet run --project SearchitBreakher`
+- Test: `cmd.exe /c dotnet test SearchitTest/SearchitTest.csproj`
+- Package: `cmd.exe /c dotnet mgcb-editor`
+- Clean: `cmd.exe /c dotnet clean`
 
-## Code Style Guidelines
-- Use camelCase for private fields with underscore prefix (e.g., `_graphics`)
-- Use PascalCase for properties, methods, classes, and public fields
-- Organize namespaces alphabetically, with System namespaces first
-- Keep methods focused and under 50 lines where possible
-- Prefer explicit access modifiers (public, private, etc.)
-- Use var for local variables when type is obvious from assignment
-- Keep lines under 100 characters when possible
-- Use braces for all control structures, even single-line statements
-- Place braces on new lines
-- Follow MonoGame conventions for game loop methods and content loading
-- Use readonly for fields that don't change after initialization
-- Keep SOLID practices in mind while working
-- Add new features using TDD
-- Write tests using strict Arrange/Act/Assert structure
-- Prefer to use fluent assertions using Assert.That where possible
-- Do not make more changes than strictly necessary to complete the request
-- 
+## Development Workflow
+- Follow strict TDD: Write tests FIRST before implementing features
+- Test structure: Use Arrange/Act/Assert pattern consistently
+- Use fluent assertions (`Assert.That`) where possible
+- Features: Only implement what's in `SearchitBreakher/features.txt`
+- Remove functionality not in `SearchitBreakher/features.txt`
+- Add missing functionality described in `SearchitBreakher/features.txt`
+
+## Code Style
+- Naming:
+  - Private fields: camelCase with underscore (`_graphics`)
+  - Public: PascalCase for properties, methods, classes, fields
+- Structure:
+  - Namespaces: Alphabetical, System namespaces first
+  - Methods: Focused, under 50 lines
+  - Lines: Under 100 characters
+  - Braces: New lines, use for all control structures
+- Best Practices:
+  - Explicit access modifiers always
+  - Use `var` when type is obvious
+  - Use `readonly` for immutable fields
+  - Follow MonoGame conventions
+  - Apply SOLID principles
+  - Minimize changes to necessary ones only

@@ -1,51 +1,41 @@
+using System;
+using System.IO;
 using System.Text.Json;
 
-namespace SearchitLibrary;
-
-public class Constants
+namespace SearchitLibrary
 {
-    // Default values
-    public const int DefaultWindowWidth = 800;
-    public const int DefaultWindowHeight = 600;
-    public const string DefaultGameTitle = "SearchitBreakher";
-    public const int DefaultFontSize = 12;
-    
-    // Properties
-    public int WindowWidth { get; set; } = DefaultWindowWidth;
-    public int WindowHeight { get; set; } = DefaultWindowHeight;
-    public string GameTitle { get; set; } = DefaultGameTitle;
-    public int FontSize { get; set; } = DefaultFontSize;
-    
-    // Create a default instance
-    private static readonly Lazy<Constants> _default = new(() => new Constants());
-    
-    // Provide access to default instance
-    public static Constants Default => _default.Value;
-    
-    // JSON serialization and deserialization
-    public void SerializeToJson(string filePath)
+    public class Constants
     {
-        var options = new JsonSerializerOptions { WriteIndented = true };
-        string jsonString = JsonSerializer.Serialize(this, options);
-        File.WriteAllText(filePath, jsonString);
-    }
-    
-    public static Constants DeserializeFromJson(string filePath)
-    {
-        if (!File.Exists(filePath))
+        public float LookSpeed { get; set; } = 0.1f;
+        public float MoveSpeed { get; set; } = 0.1f;
+
+        public void SaveToFile(string filePath)
         {
-            return Default;
+            string json = JsonSerializer.Serialize(this, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+            
+            File.WriteAllText(filePath, json);
         }
-        
-        string jsonString = File.ReadAllText(filePath);
-        try
+
+        public static Constants LoadFromFile(string filePath)
         {
-            var constants = JsonSerializer.Deserialize<Constants>(jsonString);
-            return constants ?? Default;
-        }
-        catch (JsonException)
-        {
-            return Default;
+            if (!File.Exists(filePath))
+            {
+                return new Constants();
+            }
+
+            try
+            {
+                string json = File.ReadAllText(filePath);
+                var constants = JsonSerializer.Deserialize<Constants>(json);
+                return constants ?? new Constants();
+            }
+            catch (Exception)
+            {
+                return new Constants();
+            }
         }
     }
 }

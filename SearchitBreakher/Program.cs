@@ -1,2 +1,4 @@
-﻿using var game = new SearchitBreakher.Game1();
+﻿using SearchitBreakher;
+
+using BreakerGame game = new();
 game.Run();

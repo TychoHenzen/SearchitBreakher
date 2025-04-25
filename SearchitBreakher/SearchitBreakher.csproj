@@ -31,6 +31,9 @@
         <Link>CLAUDE.md</Link>
       </Content>
     </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\SearchitLibrary\SearchitLibrary.csproj" />
+    </ItemGroup>
     <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
         <Message Text="Restoring dotnet tools" Importance="High"/>
         <Exec Command="dotnet tool restore"/>

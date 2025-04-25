@@ -1,0 +1,13 @@
+1. 3D Camera and Rendering
+   - Display an RGB colored triangle (red-green-blue vertices) in 3D space
+   - Implement a first-person camera system for navigation
+
+2. Camera Controls
+   - Mouse movement controls camera rotation (FPS-style)
+   - Horizontal mouse movement rotates camera left/right
+   - WASD keys move player relative to camera direction
+
+3. Configuration
+   - Store settings (camera sensitivity, movement speed) in a constants file
+   - Serialize configuration to disk as JSON
+   - Allow runtime modification of settings
