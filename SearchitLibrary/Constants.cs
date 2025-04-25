@@ -15,7 +15,7 @@ namespace SearchitLibrary
             {
                 WriteIndented = true
             });
-            
+
             File.WriteAllText(filePath, json);
         }
 

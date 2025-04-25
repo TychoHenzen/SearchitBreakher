@@ -10,26 +10,26 @@ public class BreakerGame : Game
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
     private MonoGameCamera _camera;
-    private TriangleRenderer _triangleRenderer;
+    private VoxelRenderer _voxelRenderer;
     private SpriteFont _font;
 
     public BreakerGame()
     {
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
-        
+
         // Hide mouse cursor for FPS-like controls
         IsMouseVisible = false;
     }
-   
+
     protected override void Initialize()
     {
         // Initialize the 3D camera
         _camera = new MonoGameCamera(GraphicsDevice);
-        
-        // Initialize the triangle renderer
-        _triangleRenderer = new TriangleRenderer(GraphicsDevice, _camera);
-        
+
+        // Initialize the voxel renderer
+        _voxelRenderer = new VoxelRenderer(GraphicsDevice, _camera);
+
         // Center the mouse in the window
         Mouse.SetPosition(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
 
@@ -39,7 +39,7 @@ public class BreakerGame : Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
-        
+
         // Load font for displaying info
         // Note: You need to add a SpriteFont to your Content project
         try
@@ -60,9 +60,9 @@ public class BreakerGame : Game
 
         // Update camera with mouse input
         _camera.Update(GraphicsDevice, gameTime);
-        
-        // Update triangle renderer with the updated camera
-        _triangleRenderer.UpdateCamera(_camera);
+
+        // Update voxel renderer with the updated camera
+        _voxelRenderer.UpdateCamera(_camera);
 
         base.Update(gameTime);
     }
@@ -71,22 +71,22 @@ public class BreakerGame : Game
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
-        // Draw the 3D triangle
-        _triangleRenderer.Draw();
-        
+        // Draw the 3D voxel
+        _voxelRenderer.Draw();
+
         // Draw UI info
         if (_font != null)
         {
             _spriteBatch.Begin();
-            
+
             // Draw information about controls and current settings using the camera's constants
-            _spriteBatch.DrawString(_font, $"Look Speed: {_camera.Constants.LookSpeed:F2} ([/] to adjust)", 
+            _spriteBatch.DrawString(_font, $"Look Speed: {_camera.Constants.LookSpeed:F2} ([/] to adjust)",
                 new Vector2(10, 10), Color.White);
-            _spriteBatch.DrawString(_font, $"Move Speed: {_camera.Constants.MoveSpeed:F2} (-/+ to adjust)", 
+            _spriteBatch.DrawString(_font, $"Move Speed: {_camera.Constants.MoveSpeed:F2} (-/+ to adjust)",
                 new Vector2(10, 30), Color.White);
-            _spriteBatch.DrawString(_font, "WASD: Move, Mouse: Look, Space/C: Up/Down", 
+            _spriteBatch.DrawString(_font, "WASD: Move, Mouse: Look, Space/C: Up/Down",
                 new Vector2(10, 50), Color.White);
-            
+
             _spriteBatch.End();
         }
 

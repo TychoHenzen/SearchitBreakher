@@ -27,13 +27,13 @@ public class Camera
         _aspectRatio = aspectRatio;
         _nearPlane = nearPlane;
         _farPlane = farPlane;
-        
+
         // Initialize yaw and pitch from initial target position
         Vector3 initialDirection = Vector3.Normalize(target - position);
         _pitch = (float)Math.Asin(initialDirection.Y);
         _yaw = (float)Math.Atan2(initialDirection.X, initialDirection.Z);
         _direction = initialDirection;
-        
+
         // Initialize right vector
         _right = Vector3.Normalize(Vector3.Cross(_direction, _up));
     }
@@ -55,9 +55,9 @@ public class Camera
         get => _up;
         set => _up = value;
     }
-    
+
     public Vector3 Direction => _direction;
-    
+
     public Vector3 Right => _right;
 
     public float MoveSpeed
@@ -89,7 +89,7 @@ public class Camera
         get => _farPlane;
         set => _farPlane = value;
     }
-    
+
     public float Yaw
     {
         get => _yaw;
@@ -99,7 +99,7 @@ public class Camera
             UpdateDirectionAndTarget();
         }
     }
-    
+
     public float Pitch
     {
         get => _pitch;
@@ -110,7 +110,7 @@ public class Camera
             UpdateDirectionAndTarget();
         }
     }
-    
+
     private void UpdateDirectionAndTarget()
     {
         // Calculate new direction vector from yaw and pitch
@@ -119,17 +119,17 @@ public class Camera
             (float)Math.Sin(_pitch),
             (float)(Math.Cos(_yaw) * Math.Cos(_pitch))
         );
-        
+
         // Normalize the direction vector
         _direction = Vector3.Normalize(_direction);
-        
+
         // Update right vector
         _right = Vector3.Normalize(Vector3.Cross(_direction, _up));
-        
+
         // Update target position based on position and direction
         _target = _position + _direction;
     }
-    
+
     public void MoveForward(float amount)
     {
         // Calculate forward vector (ignoring Y component for level movement)
@@ -138,12 +138,12 @@ public class Camera
         {
             forwardLevel = Vector3.Normalize(forwardLevel);
         }
-        
+
         // Move position and target
         _position += forwardLevel * amount * _moveSpeed;
         _target = _position + _direction;
     }
-    
+
     public void MoveRight(float amount)
     {
         // Calculate right vector (ignoring Y component for level movement)
@@ -152,12 +152,12 @@ public class Camera
         {
             rightLevel = Vector3.Normalize(rightLevel);
         }
-        
+
         // Move position and target
         _position += rightLevel * amount * _moveSpeed;
         _target = _position + _direction;
     }
-    
+
     public void MoveUp(float amount)
     {
         // Move directly up in world space

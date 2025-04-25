@@ -11,3 +11,9 @@
    - Store settings (camera sensitivity, movement speed) in a constants file
    - Serialize configuration to disk as JSON
    - Allow runtime modification of settings
+
+4. Basic Voxel Engine
+   - Replace triangle rendering with a simple voxel rendering system
+   - Render a single colored voxel (cube) in 3D space
+   - Support different colors for voxels
+   - Prepare structure for future expansion to multiple voxels
