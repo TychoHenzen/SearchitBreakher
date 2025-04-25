@@ -15,7 +15,7 @@ public class Game1 : Game
         Content.RootDirectory = "Content";
         IsMouseVisible = true;
     }
-
+   
     protected override void Initialize()
     {
         // TODO: Add your initialization logic here

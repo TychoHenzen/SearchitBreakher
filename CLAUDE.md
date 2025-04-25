@@ -20,3 +20,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Place braces on new lines
 - Follow MonoGame conventions for game loop methods and content loading
 - Use readonly for fields that don't change after initialization
+- Keep SOLID practices in mind while working
+- Add new features using TDD
+- Write tests using strict Arrange/Act/Assert structure
+- Prefer to use fluent assertions using Assert.That where possible
+- Do not make more changes than strictly necessary to complete the request
+- 
