@@ -69,11 +69,18 @@ public class BreakerGame : Game
 
     protected override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(Color.CornflowerBlue);
+        // Clear both the color and depth buffer for proper 3D rendering
+        GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1.0f, 0);
 
+        // Enable depth buffer for 3D rendering
+        GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+        
         // Draw the 3D voxel
         _voxelRenderer.Draw();
 
+        // Reset depth state for 2D UI drawing
+        GraphicsDevice.DepthStencilState = DepthStencilState.None;
+        
         // Draw UI info
         if (_font != null)
         {

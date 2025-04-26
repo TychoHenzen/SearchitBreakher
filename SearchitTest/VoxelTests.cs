@@ -18,7 +18,7 @@ public class VoxelTests
 
         // Assert
         Assert.That(voxel.Position, Is.EqualTo(position));
-        Assert.That(voxel.Color, Is.EqualTo(color));
+        Assert.That(voxel.FrontColor, Is.EqualTo(color));
         Assert.That(voxel.Size, Is.EqualTo(size));
     }
 
@@ -31,7 +31,7 @@ public class VoxelTests
         // Assert
         Assert.That(voxel, Is.Not.Null);
         Assert.That(voxel.Position, Is.EqualTo(new Vector3(0.0f, 0.0f, 0.0f)));
-        Assert.That(voxel.Color, Is.EqualTo(new Vector3(1.0f, 0.0f, 0.0f))); // Red
+        Assert.That(voxel.FrontColor, Is.EqualTo(new Vector3(1.0f, 0.0f, 0.0f))); // Red
         Assert.That(voxel.Size, Is.EqualTo(1.0f));
     }
 
@@ -95,10 +95,10 @@ public class VoxelTests
         Assert.That(indices, Is.Not.Null);
         Assert.That(indices.Length, Is.EqualTo(36)); // 12 triangles * 3 indices
 
-        // Check that all indices are in the valid range (0-7) for the vertices
+        // Check that all indices are in the valid range (0-23) for the vertices per face
         foreach (var index in indices)
         {
-            Assert.That(index, Is.InRange(0, 7));
+            Assert.That(index, Is.InRange(0, 23));
         }
 
         // Check that we have exactly 12 triangles (6 faces, 2 triangles per face)

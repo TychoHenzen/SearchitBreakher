@@ -1,5 +1,4 @@
-Add simplistic shading based on distance so we can verify that triangles are oriented correctly, 
-we should also color each face a different color
+Add simplistic shading based on distance, darkening geometry that is further away
 ----------------------
 the game will feature a voxel engine with small voxels that are untextured,
 the voxel engine will use block ids of 1 byte,

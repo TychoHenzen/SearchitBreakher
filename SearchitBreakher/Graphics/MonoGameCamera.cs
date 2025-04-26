@@ -19,6 +19,12 @@ public class MonoGameCamera
 
     public Constants Constants => _constants;
 
+    public Vector3 Position => new Vector3(
+        _camera.Position.X,
+        _camera.Position.Y,
+        _camera.Position.Z
+    );
+
     public MonoGameCamera(GraphicsDevice graphicsDevice, float fieldOfView = MathHelper.PiOver4)
     {
         var position = new System.Numerics.Vector3(0, 0, 5);

@@ -46,10 +46,16 @@ public class VoxelRenderer
 
     private void UpdateVertices()
     {
-        // Get the voxel vertices and indices
+        // Get the voxel vertices, colors, and indices
         var voxelVertices = _currentVoxel.GetVerticesPerFace();
         var voxelColors = _currentVoxel.GetVertexColors();
         var voxelIndices = _currentVoxel.GetIndices();
+
+        // Verify that the vertex and color arrays have the same length
+        if (voxelVertices.Length != voxelColors.Length)
+        {
+            throw new InvalidOperationException($"Vertex count ({voxelVertices.Length}) does not match color count ({voxelColors.Length})");
+        }
 
         // Create the vertex array
         _vertices = new VertexPositionColor[voxelVertices.Length];
@@ -77,7 +83,7 @@ public class VoxelRenderer
             );
         }
 
-        // Store the indices
+        // Store the indices - these should reference the vertices within our 0-23 range
         _indices = voxelIndices;
     }
 
@@ -108,10 +114,21 @@ public class VoxelRenderer
 
     public void Draw()
     {
+        // Clear the depth buffer before drawing
+        _graphicsDevice.Clear(ClearOptions.DepthBuffer, Color.CornflowerBlue, 1.0f, 0);
+        
         // Set render state
         _graphicsDevice.RasterizerState = new RasterizerState
         {
-            CullMode = CullMode.CullCounterClockwiseFace
+            CullMode = CullMode.CullCounterClockwiseFace,  // Enable standard backface culling
+            FillMode = FillMode.Solid
+        };
+        
+        // Ensure depth buffer is enabled and configured correctly for proper z-ordering
+        _graphicsDevice.DepthStencilState = new DepthStencilState
+        {
+            DepthBufferEnable = true,
+            DepthBufferFunction = CompareFunction.LessEqual
         };
 
         // Apply the effect

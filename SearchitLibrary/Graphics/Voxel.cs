@@ -100,79 +100,80 @@ public class Voxel
     }
 
     // Get vertices for each face separately (for colored faces)
+    // Ensuring that vertices are defined in a consistent counter-clockwise order when viewed from outside
     public Vector3[] GetVerticesPerFace()
     {
         float halfSize = Size / 2.0f;
         
-        return new Vector3[]
-        {
-            // Front face (4 vertices)
-            Position + new Vector3(-halfSize, -halfSize, -halfSize), // front bottom left
-            Position + new Vector3(halfSize, -halfSize, -halfSize),  // front bottom right
-            Position + new Vector3(-halfSize, halfSize, -halfSize),  // front top left
-            Position + new Vector3(halfSize, halfSize, -halfSize),   // front top right
+        return
+        [
+            // Front face (-Z direction) - Counter-clockwise when viewed from front
+            Position + new Vector3(-halfSize, -halfSize, -halfSize), // front bottom left (0)
+            Position + new Vector3(halfSize, -halfSize, -halfSize),  // front bottom right (1)
+            Position + new Vector3(-halfSize, halfSize, -halfSize),  // front top left (2)
+            Position + new Vector3(halfSize, halfSize, -halfSize),   // front top right (3)
             
-            // Back face (4 vertices)
-            Position + new Vector3(-halfSize, -halfSize, halfSize),  // back bottom left
-            Position + new Vector3(halfSize, -halfSize, halfSize),   // back bottom right
-            Position + new Vector3(-halfSize, halfSize, halfSize),   // back top left
-            Position + new Vector3(halfSize, halfSize, halfSize),    // back top right
+            // Back face (+Z direction) - Counter-clockwise when viewed from back
+            Position + new Vector3(halfSize, -halfSize, halfSize),   // back bottom right (4)
+            Position + new Vector3(-halfSize, -halfSize, halfSize),  // back bottom left (5)
+            Position + new Vector3(halfSize, halfSize, halfSize),    // back top right (6)
+            Position + new Vector3(-halfSize, halfSize, halfSize),   // back top left (7)
             
-            // Left face (4 vertices)
-            Position + new Vector3(-halfSize, -halfSize, halfSize),  // back bottom left
-            Position + new Vector3(-halfSize, -halfSize, -halfSize), // front bottom left
-            Position + new Vector3(-halfSize, halfSize, halfSize),   // back top left
-            Position + new Vector3(-halfSize, halfSize, -halfSize),  // front top left
+            // Left face (-X direction) - Counter-clockwise when viewed from left
+            Position + new Vector3(-halfSize, -halfSize, halfSize),  // back bottom left (8)
+            Position + new Vector3(-halfSize, -halfSize, -halfSize), // front bottom left (9)
+            Position + new Vector3(-halfSize, halfSize, halfSize),   // back top left (10)
+            Position + new Vector3(-halfSize, halfSize, -halfSize),  // front top left (11)
             
-            // Right face (4 vertices)
-            Position + new Vector3(halfSize, -halfSize, -halfSize),  // front bottom right
-            Position + new Vector3(halfSize, -halfSize, halfSize),   // back bottom right
-            Position + new Vector3(halfSize, halfSize, -halfSize),   // front top right
-            Position + new Vector3(halfSize, halfSize, halfSize),    // back top right
+            // Right face (+X direction) - Counter-clockwise when viewed from right
+            Position + new Vector3(halfSize, -halfSize, -halfSize),  // front bottom right (12)
+            Position + new Vector3(halfSize, -halfSize, halfSize),   // back bottom right (13)
+            Position + new Vector3(halfSize, halfSize, -halfSize),   // front top right (14)
+            Position + new Vector3(halfSize, halfSize, halfSize),    // back top right (15)
             
-            // Top face (4 vertices)
-            Position + new Vector3(-halfSize, halfSize, -halfSize),  // front top left
-            Position + new Vector3(halfSize, halfSize, -halfSize),   // front top right
-            Position + new Vector3(-halfSize, halfSize, halfSize),   // back top left
-            Position + new Vector3(halfSize, halfSize, halfSize),    // back top right
+            // Top face (+Y direction) - Counter-clockwise when viewed from top
+            Position + new Vector3(halfSize, halfSize, -halfSize),   // front top right (16)
+            Position + new Vector3(-halfSize, halfSize, -halfSize),  // front top left (17)
+            Position + new Vector3(halfSize, halfSize, halfSize),    // back top right (18)
+            Position + new Vector3(-halfSize, halfSize, halfSize),   // back top left (19)
             
-            // Bottom face (4 vertices)
-            Position + new Vector3(-halfSize, -halfSize, -halfSize), // front bottom left
-            Position + new Vector3(halfSize, -halfSize, -halfSize),  // front bottom right
-            Position + new Vector3(-halfSize, -halfSize, halfSize),  // back bottom left
-            Position + new Vector3(halfSize, -halfSize, halfSize)    // back bottom right
-        };
+            // Bottom face (-Y direction) - Counter-clockwise when viewed from bottom
+            Position + new Vector3(-halfSize, -halfSize, -halfSize), // front bottom left (20)
+            Position + new Vector3(halfSize, -halfSize, -halfSize),  // front bottom right (21)
+            Position + new Vector3(-halfSize, -halfSize, halfSize),  // back bottom left (22)
+            Position + new Vector3(halfSize, -halfSize, halfSize)    // back bottom right (23)
+        ];
     }
 
     public int[] GetIndices()
     {
         // Define triangles for a cube using indices (two triangles per face)
-        // Adjusted for the new vertex layout (24 vertices, 4 per face)
+        // For each face, the vertices are arranged in counter-clockwise order when viewed from outside
         return new int[]
         {
-            // Front face
-            0, 2, 1,  // Triangle 1
-            1, 2, 3,  // Triangle 2
+            // Front face (-Z direction) - CCW from outside
+            0, 1, 2,  // Triangle 1: bottom-left → bottom-right → top-left
+            2, 1, 3,  // Triangle 2: top-left → bottom-right → top-right
             
-            // Back face
-            4, 6, 5,  // Triangle 3
-            5, 6, 7,  // Triangle 4
+            // Back face (+Z direction) - CCW from outside
+            4, 5, 6,  // Triangle 3: bottom-right → bottom-left → top-right
+            6, 5, 7,  // Triangle 4: top-right → bottom-left → top-left
             
-            // Left face
-            8, 10, 9,  // Triangle 5
-            9, 10, 11, // Triangle 6
+            // Left face (-X direction) - CCW from outside
+            8, 9, 10,  // Triangle 5: back-bottom → front-bottom → back-top
+            10, 9, 11, // Triangle 6: back-top → front-bottom → front-top
             
-            // Right face
-            12, 14, 13, // Triangle 7
-            13, 14, 15, // Triangle 8
+            // Right face (+X direction) - CCW from outside
+            12, 13, 14, // Triangle 7: front-bottom → back-bottom → front-top
+            14, 13, 15, // Triangle 8: front-top → back-bottom → back-top
             
-            // Top face
-            16, 18, 17, // Triangle 9
-            17, 18, 19, // Triangle 10
+            // Top face (+Y direction) - CCW from outside
+            16, 18,17, // Triangle 9: front-right → front-left → back-right
+            18, 19,17, // Triangle 10: back-right → front-left → back-left
             
-            // Bottom face
-            20, 21, 22, // Triangle 11
-            22, 21, 23  // Triangle 12
+            // Bottom face (-Y direction) - CCW from outside
+            20, 22, 21, // Triangle 11: front-left → back-left → front-right
+            21, 22, 23  // Triangle 12: front-right → back-left → back-right
         };
     }
 }
