@@ -9,9 +9,9 @@ namespace SearchitLibrary.Graphics;
 public class VoxelShader
 {
     // Constants for distance-based shading - extremely dramatic settings for maximum visibility
-    public float MinDistance { get; set; } = 1.0f;
-    public float MaxDistance { get; set; } = 30.0f;
-    public float MinShade { get; set; } = 0.05f;  // Almost black at max distance
+    public float MinDistance { get; set; } = 2.0f;
+    public float MaxDistance { get; set; } = 20.0f;
+    public float MinShade { get; set; } = 0.5f; 
     public float MaxShade { get; set; } = 1.0f;
 
     /// <summary>

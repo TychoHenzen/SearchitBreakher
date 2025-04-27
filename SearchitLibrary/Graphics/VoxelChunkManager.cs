@@ -14,36 +14,38 @@ public class VoxelChunkManager
     private readonly string _chunkDirectory;
     private Vector3 _playerPosition;
 
-    public VoxelChunkManager(string chunkDirectory)
+    public VoxelChunkManager(string? chunkDirectory)
     {
         _chunks = new Dictionary<Vector3, VoxelChunk>();
-        _chunkDirectory = chunkDirectory;
+        _chunkDirectory = chunkDirectory ?? Path.Combine(Directory.GetCurrentDirectory(), "Chunks");
         _playerPosition = Vector3.Zero;
         
         // Create the directory if it doesn't exist
-        if (!string.IsNullOrEmpty(chunkDirectory) && !Directory.Exists(chunkDirectory))
+        if (!string.IsNullOrEmpty(_chunkDirectory) && !Directory.Exists(_chunkDirectory))
         {
-            Directory.CreateDirectory(chunkDirectory);
+            Directory.CreateDirectory(_chunkDirectory);
         }
     }
     
     /// <summary>
-    /// Loads a chunk at the specified position.
+    /// Loads a chunk at the specified position. If the chunk doesn't exist, 
+    /// creates a new chunk with test pattern.
     /// </summary>
-    public VoxelChunk LoadChunk(Vector3 chunkPosition)
+    public VoxelChunk? LoadChunk(Vector3 chunkPosition)
     {
         // Check if the chunk is already loaded
-        if (_chunks.TryGetValue(chunkPosition, out VoxelChunk existingChunk))
+        if (_chunks.TryGetValue(chunkPosition, out VoxelChunk? existingChunk))
         {
             return existingChunk;
         }
+        
+        VoxelChunk? chunk = null;
         
         // Determine the chunk file path
         string chunkFileName = $"Chunk_{chunkPosition.X}_{chunkPosition.Y}_{chunkPosition.Z}.gox";
         string chunkFilePath = Path.Combine(_chunkDirectory, chunkFileName);
         
-        // Try to load the chunk from file, or create a test chunk if the file doesn't exist
-        VoxelChunk chunk;
+        // Try to load the chunk from file if it exists
         if (File.Exists(chunkFilePath))
         {
             try
@@ -71,7 +73,6 @@ public class VoxelChunkManager
     
     /// <summary>
     /// Loads chunks in a radius around the player position and unloads distant chunks.
-    /// Currently limited to only load the chunk the player is in.
     /// </summary>
     public void UpdateChunksAroundPlayer(Vector3 playerPosition, int loadRadius)
     {
@@ -84,16 +85,39 @@ public class VoxelChunkManager
             MathF.Floor(playerPosition.Z / VoxelChunk.ChunkSize) * VoxelChunk.ChunkSize
         );
         
-        // Set of chunks that should be loaded (only one for now)
+        // Set of chunks that should be loaded
         HashSet<Vector3> chunksToKeep = new HashSet<Vector3>();
         
-        // Only load the chunk the player is currently in
-        chunksToKeep.Add(playerChunkPos);
+        // Load chunks in a radius around the player
+        int chunkRadius = Math.Max(1, loadRadius);
         
-        // Load the chunk if it's not already loaded
-        if (!_chunks.ContainsKey(playerChunkPos))
+        // Convert player position to chunk coordinates (integers)
+        int playerChunkX = (int)MathF.Floor(playerPosition.X / VoxelChunk.ChunkSize);
+        int playerChunkY = (int)MathF.Floor(playerPosition.Y / VoxelChunk.ChunkSize);
+        int playerChunkZ = (int)MathF.Floor(playerPosition.Z / VoxelChunk.ChunkSize);
+        
+        // Add all chunks within the radius to the set of chunks to keep
+        for (int x = playerChunkX - chunkRadius; x <= playerChunkX + chunkRadius; x++)
         {
-            LoadChunk(playerChunkPos);
+            for (int y = playerChunkY - chunkRadius; y <= playerChunkY + chunkRadius; y++)
+            {
+                for (int z = playerChunkZ - chunkRadius; z <= playerChunkZ + chunkRadius; z++)
+                {
+                    Vector3 chunkPos = new Vector3(
+                        x * VoxelChunk.ChunkSize,
+                        y * VoxelChunk.ChunkSize,
+                        z * VoxelChunk.ChunkSize
+                    );
+                    
+                    chunksToKeep.Add(chunkPos);
+                    
+                    // Load the chunk if it's not already loaded
+                    if (!_chunks.ContainsKey(chunkPos))
+                    {
+                        LoadChunk(chunkPos);
+                    }
+                }
+            }
         }
         
         // Identify chunks to unload (chunks that are too far from the player)
@@ -134,7 +158,7 @@ public class VoxelChunkManager
         );
         
         // Check if the chunk is loaded
-        if (!_chunks.TryGetValue(chunkPos, out VoxelChunk chunk))
+        if (!_chunks.TryGetValue(chunkPos, out VoxelChunk? chunk) || chunk == null)
         {
             return 0; // Empty voxel for unloaded chunks
         }
@@ -159,9 +183,15 @@ public class VoxelChunkManager
         );
         
         // Try to get the chunk, or load it if it's not loaded
-        if (!_chunks.TryGetValue(chunkPos, out VoxelChunk chunk))
+        if (!_chunks.TryGetValue(chunkPos, out VoxelChunk? chunk))
         {
             chunk = LoadChunk(chunkPos);
+        }
+        
+        // If the chunk is null, we can't set the voxel
+        if (chunk == null)
+        {
+            return;
         }
         
         // Calculate the position within the chunk
@@ -183,24 +213,37 @@ public class VoxelChunkManager
     }
     
     /// <summary>
-    /// Creates a single test chunk at the origin.
+    /// Creates test chunks in a cubic radius from the origin.
     /// </summary>
     public void CreateTestChunks(int radius)
     {
-        // Only create one test chunk at the origin
-        Vector3 chunkPos = new(0, 0, 0);
-        
-        // Load or create the chunk
-        if (!_chunks.ContainsKey(chunkPos))
+        // Create test chunks in a (2*radius+1)^3 cube centered at the origin
+        for (int x = -radius; x <= radius; x++)
         {
-            _chunks[chunkPos] = VoxelChunk.CreateTestChunk(chunkPos);
+            for (int y = -radius; y <= radius; y++)
+            {
+                for (int z = -radius; z <= radius; z++)
+                {
+                    Vector3 chunkPos = new(
+                        x * VoxelChunk.ChunkSize,
+                        y * VoxelChunk.ChunkSize,
+                        z * VoxelChunk.ChunkSize
+                    );
+                    
+                    // Load or create the chunk if it doesn't exist
+                    if (!_chunks.ContainsKey(chunkPos))
+                    {
+                        _chunks[chunkPos] = VoxelChunk.CreateTestChunk(chunkPos);
+                    }
+                }
+            }
         }
     }
     
     /// <summary>
     /// Gets the chunk that contains the specified world position.
     /// </summary>
-    public VoxelChunk GetChunkAt(Vector3 worldPosition)
+    public VoxelChunk? GetChunkAt(Vector3 worldPosition)
     {
         // Calculate the chunk position
         Vector3 chunkPos = new Vector3(
@@ -210,7 +253,7 @@ public class VoxelChunkManager
         );
         
         // Try to get the chunk, or load it if it's not loaded
-        if (!_chunks.TryGetValue(chunkPos, out VoxelChunk chunk))
+        if (!_chunks.TryGetValue(chunkPos, out VoxelChunk? chunk))
         {
             chunk = LoadChunk(chunkPos);
         }
@@ -221,10 +264,10 @@ public class VoxelChunkManager
     /// <summary>
     /// Gets the chunk at the specified chunk position.
     /// </summary>
-    public VoxelChunk GetChunk(Vector3 chunkPosition)
+    public VoxelChunk? GetChunk(Vector3 chunkPosition)
     {
         // Try to get the chunk, or load it if it's not loaded
-        if (!_chunks.TryGetValue(chunkPosition, out VoxelChunk chunk))
+        if (!_chunks.TryGetValue(chunkPosition, out VoxelChunk? chunk))
         {
             chunk = LoadChunk(chunkPosition);
         }

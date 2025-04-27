@@ -56,11 +56,11 @@ public class VoxelChunkManagerTests
         Vector3 chunkPos = new Vector3(0, 0, 0);
         
         // Act
-        VoxelChunk chunk = manager.LoadChunk(chunkPos);
+        VoxelChunk? chunk = manager.LoadChunk(chunkPos);
         
         // Assert
         Assert.That(chunk, Is.Not.Null);
-        Assert.That(chunk.Position, Is.EqualTo(chunkPos));
+        Assert.That(chunk!.Position, Is.EqualTo(chunkPos));
         Assert.That(manager.LoadedChunkCount, Is.EqualTo(1));
     }
     
@@ -70,10 +70,11 @@ public class VoxelChunkManagerTests
         // Arrange
         VoxelChunkManager manager = new VoxelChunkManager(_testChunkDirectory);
         Vector3 chunkPos = new Vector3(0, 0, 0);
-        VoxelChunk firstChunk = manager.LoadChunk(chunkPos);
+        VoxelChunk? firstChunk = manager.LoadChunk(chunkPos);
+        Assert.That(firstChunk, Is.Not.Null);
         
         // Act
-        VoxelChunk secondChunk = manager.LoadChunk(chunkPos);
+        VoxelChunk? secondChunk = manager.LoadChunk(chunkPos);
         
         // Assert
         Assert.That(secondChunk, Is.SameAs(firstChunk));
@@ -177,11 +178,14 @@ public class VoxelChunkManagerTests
         // Arrange
         VoxelChunkManager manager = new VoxelChunkManager(_testChunkDirectory);
         Vector3 chunkPos = new Vector3(0, 0, 0);
-        VoxelChunk chunk = manager.LoadChunk(chunkPos);
+        VoxelChunk? chunk = manager.LoadChunk(chunkPos);
+        
+        // Ensure chunk is not null
+        Assert.That(chunk, Is.Not.Null);
         
         // Set a specific voxel
         Vector3 localPos = new Vector3(5, 10, 15);
-        chunk.SetVoxel(localPos, 3);
+        chunk!.SetVoxel(localPos, 3);
         
         // Calculate the global position
         Vector3 globalPos = chunkPos + localPos;
