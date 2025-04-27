@@ -17,8 +17,22 @@
    - Render a single colored voxel (cube) in 3D space
    - Support different colors for voxels
    - Prepare structure for future expansion to multiple voxels
-   
+
 5. Enhanced Voxel Rendering
-  - Add simplistic distance-based shading to voxels
-  - Implement unique colors for each face of a voxel
-  - Ensure proper triangle orientation for correct rendering
+   - Add simplistic distance-based shading to voxels
+   - Implement unique colors for each face of a voxel
+   - Ensure proper triangle orientation for correct rendering
+
+6. Chunk-Based Voxel System
+   - Divide voxel world into fixed-size chunks (32x32x32)
+   - chunk loading and unloading system
+   - Support view frustum culling for efficient rendering
+   - Allow dynamic loading of chunks around the player
+   - Provide framework for loading .gox files
+
+7. Multi-Chunk Management
+   - Coordinate system for multiple chunks
+   - Support for looking up voxels across chunk boundaries
+   - Dynamic chunk loading based on player position
+   - Adjustable loading radius for performance tuning
+   - Optimized mesh generation with visibility checks

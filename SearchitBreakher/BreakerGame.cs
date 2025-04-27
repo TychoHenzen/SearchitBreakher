@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SearchitBreakher.Graphics;
+using SearchitLibrary.Graphics;
+using System.IO;
 
 namespace SearchitBreakher;
 
@@ -12,6 +14,11 @@ public class BreakerGame : Game
     private MonoGameCamera _camera;
     private VoxelRenderer _voxelRenderer;
     private SpriteFont _font;
+    
+    // Add chunk management
+    private VoxelChunkManager _chunkManager;
+    private ChunkRendererManager _chunkRendererManager;
+    private int _loadRadius = 3; // How many chunks to load around the player
 
     public BreakerGame()
     {
@@ -29,6 +36,9 @@ public class BreakerGame : Game
 
         // Initialize the voxel renderer
         _voxelRenderer = new VoxelRenderer(GraphicsDevice, _camera);
+        
+        // Initialize chunk renderer manager
+        _chunkRendererManager = new ChunkRendererManager(GraphicsDevice, _camera);
 
         // Center the mouse in the window
         Mouse.SetPosition(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
@@ -41,7 +51,6 @@ public class BreakerGame : Game
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
         // Load font for displaying info
-        // Note: You need to add a SpriteFont to your Content project
         try
         {
             _font = Content.Load<SpriteFont>("Font");
@@ -50,6 +59,35 @@ public class BreakerGame : Game
         {
             // Font might not be available yet
         }
+        
+        // Initialize chunk manager with path to voxels folder
+        string voxelsPath = Path.Combine(Content.RootDirectory, "voxels");
+        _chunkManager = new VoxelChunkManager(voxelsPath);
+        
+        // Ensure the directory exists
+        _chunkManager.EnsureChunkDirectoryExists();
+        
+        // Initial load of chunks around the starting position
+        UpdateLoadedChunks();
+        
+        // Also create a test chunk if none are loaded
+        if (_chunkManager.LoadedChunkCount == 0)
+        {
+            _chunkManager.CreateTestChunks(1);
+        }
+    }
+    
+    private void UpdateLoadedChunks()
+    {
+        // Convert MonoGame Vector3 to System.Numerics.Vector3 for chunk manager
+        System.Numerics.Vector3 playerPos = new(
+            _camera.Position.X,
+            _camera.Position.Y,
+            _camera.Position.Z
+        );
+        
+        // Update chunks around player
+        _chunkManager.UpdateChunksAroundPlayer(playerPos, _loadRadius);
     }
 
     protected override void Update(GameTime gameTime)
@@ -61,8 +99,14 @@ public class BreakerGame : Game
         // Update camera with mouse input
         _camera.Update(GraphicsDevice, gameTime);
 
-        // Update voxel renderer with the updated camera
+        // Update voxel renderer with the updated camera 
         _voxelRenderer.UpdateCamera(_camera);
+        
+        // Update chunk renderer manager with the updated camera
+        _chunkRendererManager.UpdateCamera(_camera);
+        
+        // Update which chunks are loaded based on player position
+        UpdateLoadedChunks();
 
         base.Update(gameTime);
     }
@@ -75,8 +119,11 @@ public class BreakerGame : Game
         // Enable depth buffer for 3D rendering
         GraphicsDevice.DepthStencilState = DepthStencilState.Default;
         
-        // Draw the 3D voxel
-        _voxelRenderer.Draw();
+        // Create a frustum for view-frustum culling
+        BoundingFrustum viewFrustum = new BoundingFrustum(_camera.GetViewMatrix() * _camera.GetProjectionMatrix());
+        
+        // Draw all chunks in view frustum
+        _chunkRendererManager.RenderVisibleChunks(_chunkManager, viewFrustum);
 
         // Reset depth state for 2D UI drawing
         GraphicsDevice.DepthStencilState = DepthStencilState.None;
@@ -93,6 +140,27 @@ public class BreakerGame : Game
                 new Vector2(10, 30), Color.White);
             _spriteBatch.DrawString(_font, "WASD: Move, Mouse: Look, Space/C: Up/Down",
                 new Vector2(10, 50), Color.White);
+                
+            // Add camera position info for debugging shading
+            _spriteBatch.DrawString(_font, 
+                $"Camera Position: ({_camera.Position.X:F2}, {_camera.Position.Y:F2}, {_camera.Position.Z:F2})",
+                new Vector2(10, 70), Color.Yellow);
+                
+            // Add distance info
+            float distance = Vector3.Distance(_camera.Position, Vector3.Zero);
+            _spriteBatch.DrawString(_font, 
+                $"Distance to Origin: {distance:F2} units",
+                new Vector2(10, 90), Color.Yellow);
+                
+            // Add chunk loading info
+            _spriteBatch.DrawString(_font, 
+                $"Loaded Chunks: {_chunkManager.LoadedChunkCount} | Rendered: {_chunkRendererManager.RendererCount}",
+                new Vector2(10, 110), Color.LightGreen);
+            
+            // Add face color info
+            _spriteBatch.DrawString(_font, 
+                "Front: Red | Back: Green | Left: Blue | Right: Yellow | Top: Magenta | Bottom: Cyan",
+                new Vector2(10, 130), Color.White);
 
             _spriteBatch.End();
         }

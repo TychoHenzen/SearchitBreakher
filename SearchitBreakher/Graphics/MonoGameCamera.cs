@@ -27,7 +27,8 @@ public class MonoGameCamera
 
     public MonoGameCamera(GraphicsDevice graphicsDevice, float fieldOfView = MathHelper.PiOver4)
     {
-        var position = new System.Numerics.Vector3(0, 0, 5);
+        // Position camera at an angle to better show shading on different faces
+        var position = new System.Numerics.Vector3(5, 3, 8);
         var target = new System.Numerics.Vector3(0, 0, 0);
         var up = new System.Numerics.Vector3(0, 1, 0);
         var aspectRatio = (float)graphicsDevice.Viewport.Width / graphicsDevice.Viewport.Height;

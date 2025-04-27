@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SearchitLibrary.Graphics;
 using System;
+using Vector3 = Microsoft.Xna.Framework.Vector3;
 
 namespace SearchitBreakher.Graphics;
 
@@ -13,17 +14,13 @@ public class VoxelRenderer
     private int[] _indices;
     private MonoGameCamera _camera;
     private Voxel _currentVoxel;
-
-    // Constants for distance-based shading
-    private const float MinDistance = 2.0f;
-    private const float MaxDistance = 20.0f;
-    private const float MinShade = 0.5f;
-    private const float MaxShade = 1.0f;
+    private readonly VoxelShader _shader;
 
     public VoxelRenderer(GraphicsDevice graphicsDevice, MonoGameCamera camera)
     {
         _graphicsDevice = graphicsDevice;
         _camera = camera;
+        _shader = new VoxelShader();
 
         // Create the effect
         _basicEffect = new BasicEffect(graphicsDevice)
@@ -34,7 +31,8 @@ public class VoxelRenderer
             World = Matrix.Identity
         };
 
-        // Initialize with a basic voxel
+        // We're now using the ChunkRendererManager for rendering voxels
+        // This basic voxel will only be used if chunk loading doesn't work
         SetVoxel(Voxel.CreateBasicVoxel());
     }
 
@@ -61,42 +59,43 @@ public class VoxelRenderer
         _vertices = new VertexPositionColor[voxelVertices.Length];
         for (int i = 0; i < voxelVertices.Length; i++)
         {
-            // Apply distance-based shading
-            Vector3 position = new Vector3(voxelVertices[i].X, voxelVertices[i].Y, voxelVertices[i].Z);
-            Vector3 cameraPosition = new Vector3(_camera.Position.X, _camera.Position.Y, _camera.Position.Z);
-            float distance = Vector3.Distance(position, cameraPosition);
+            // Convert XNA Vector3 to System.Numerics.Vector3 for shader use
+            System.Numerics.Vector3 position = new(
+                voxelVertices[i].X, 
+                voxelVertices[i].Y, 
+                voxelVertices[i].Z
+            );
             
-            // Calculate shade factor based on distance
-            float shadeFactor = CalculateShadeFactor(distance);
+            System.Numerics.Vector3 cameraPosition = new(
+                _camera.Position.X, 
+                _camera.Position.Y, 
+                _camera.Position.Z
+            );
             
-            // Apply shade factor to the color
-            Vector3 color = voxelColors[i] * shadeFactor;
+            // Apply distance-based shading using VoxelShader
+            System.Numerics.Vector3 shadedColor = _shader.ApplyDistanceShading(
+                voxelColors[i], 
+                position, 
+                cameraPosition
+            );
             
-            // Clamp color values to valid range
-            color.X = Math.Clamp(color.X, 0.0f, 1.0f);
-            color.Y = Math.Clamp(color.Y, 0.0f, 1.0f);
-            color.Z = Math.Clamp(color.Z, 0.0f, 1.0f);
+            // Force more dramatic contrast for debugging
+            float distance = System.Numerics.Vector3.Distance(position, cameraPosition);
+            if (distance > _shader.MinDistance + 0.5f)
+            {
+                // Apply stronger darkening for farther vertices
+                shadedColor *= System.MathF.Max(0.05f, 1.0f - (distance / _shader.MaxDistance));
+            }
             
+            // Create the vertex with shaded color
             _vertices[i] = new VertexPositionColor(
-                position,
-                new Color(color.X, color.Y, color.Z)
+                new Vector3(position.X, position.Y, position.Z),
+                new Color(shadedColor.X, shadedColor.Y, shadedColor.Z)
             );
         }
 
         // Store the indices - these should reference the vertices within our 0-23 range
         _indices = voxelIndices;
-    }
-
-    private float CalculateShadeFactor(float distance)
-    {
-        // Linear interpolation between MinShade and MaxShade based on distance
-        if (distance <= MinDistance)
-            return MaxShade;
-        if (distance >= MaxDistance)
-            return MinShade;
-            
-        float t = (distance - MinDistance) / (MaxDistance - MinDistance);
-        return MaxShade - t * (MaxShade - MinShade);
     }
 
     public void UpdateCamera(MonoGameCamera camera)

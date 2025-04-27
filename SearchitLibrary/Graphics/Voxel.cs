@@ -168,8 +168,8 @@ public class Voxel
             14, 13, 15, // Triangle 8: front-top → back-bottom → back-top
             
             // Top face (+Y direction) - CCW from outside
-            16, 18,17, // Triangle 9: front-right → front-left → back-right
-            18, 19,17, // Triangle 10: back-right → front-left → back-left
+            16, 17, 18, // Triangle 9: front-right → front-left → back-right
+            18, 17, 19, // Triangle 10: back-right → front-left → back-left
             
             // Bottom face (-Y direction) - CCW from outside
             20, 22, 21, // Triangle 11: front-left → back-left → front-right
