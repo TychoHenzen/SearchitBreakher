@@ -79,20 +79,19 @@ public class VoxelChunk
         y = Math.Clamp(y, 0, ChunkSize - 1);
         z = Math.Clamp(z, 0, ChunkSize - 1);
         
-        // Using x-major ordering (z changes most rapidly, then y, then x)
-        // Match the convention used in VoxelConstants.Index in the reference code
-        return x * ChunkSize * ChunkSize + y * ChunkSize + z;
+        // Using y-major ordering to match the reference implementation's VoxelConstants.Index
+        return y * ChunkSize * ChunkSize + z * ChunkSize + x;
     }
     
     // Converts an index back to coordinates
     public static Vector3 GetPosition(int index)
     {
-        // Match the above GetIndex formula by reversing it
+        // Match the updated GetIndex formula by reversing it
+        int x = index % ChunkSize;
+        index /= ChunkSize;
         int z = index % ChunkSize;
         index /= ChunkSize;
-        int y = index % ChunkSize;
-        index /= ChunkSize;
-        int x = index;
+        int y = index;
         
         return new Vector3(x, y, z);
     }

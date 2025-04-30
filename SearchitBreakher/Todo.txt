@@ -1,4 +1,4 @@
-Our voxel engine appears to be partially working, but the chunk data appears to be mangled while loading, 
+Tests are failing, let's fix them
 ----------------------
 the game will feature a voxel engine with small voxels that are untextured,
 the voxel engine will use block ids of 1 integer,

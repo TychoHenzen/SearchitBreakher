@@ -39,7 +39,7 @@ public class VoxelChunkManager
             return existingChunk;
         }
         
-        VoxelChunk? chunk = null;
+        VoxelChunk? chunk;
         
         // Determine the chunk file path
         string chunkFileName = $"Chunk_{chunkPosition.X}_{chunkPosition.Y}_{chunkPosition.Z}.gox";

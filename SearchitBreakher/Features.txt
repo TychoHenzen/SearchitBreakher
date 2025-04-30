@@ -36,3 +36,4 @@
    - Dynamic chunk loading based on player position
    - Adjustable loading radius for performance tuning
    - Optimized mesh generation with visibility checks
+   - When no file is present to be loaded, we should NOT generate a chunk

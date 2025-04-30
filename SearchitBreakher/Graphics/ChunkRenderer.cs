@@ -256,7 +256,7 @@ public class ChunkRenderer
     {
         float voxelSize = 1.0f; // Unit size for voxels
         float halfSize = voxelSize / 2.0f;
-        System.Numerics.Vector3 cameraPosition = new System.Numerics.Vector3(
+        System.Numerics.Vector3 cameraPosition = new(
             _camera.Position.X, 
             _camera.Position.Y, 
             _camera.Position.Z
@@ -266,12 +266,12 @@ public class ChunkRenderer
         if (z == 0 || _currentChunk.GetVoxel(x, y, z - 1) == 0)
         {
             AddFace(
-                new[] {
+                [
                     position + new System.Numerics.Vector3(-halfSize, -halfSize, -halfSize), // front bottom left (0)
                     position + new System.Numerics.Vector3(halfSize, -halfSize, -halfSize),  // front bottom right (1)
                     position + new System.Numerics.Vector3(-halfSize, halfSize, -halfSize),  // front top left (2)
                     position + new System.Numerics.Vector3(halfSize, halfSize, -halfSize)    // front top right (3)
-                },
+                ],
                 faceColors[0], // Front face color
                 cameraPosition,
                 vertexOffset,
@@ -285,12 +285,12 @@ public class ChunkRenderer
         if (z == VoxelChunk.ChunkSize - 1 || _currentChunk.GetVoxel(x, y, z + 1) == 0)
         {
             AddFace(
-                new[] {
+                [
                     position + new System.Numerics.Vector3(halfSize, -halfSize, halfSize),   // back bottom right (4)
                     position + new System.Numerics.Vector3(-halfSize, -halfSize, halfSize),  // back bottom left (5)
                     position + new System.Numerics.Vector3(halfSize, halfSize, halfSize),    // back top right (6)
                     position + new System.Numerics.Vector3(-halfSize, halfSize, halfSize)    // back top left (7)
-                },
+                ],
                 faceColors[1], // Back face color
                 cameraPosition,
                 vertexOffset,
@@ -304,12 +304,12 @@ public class ChunkRenderer
         if (x == 0 || _currentChunk.GetVoxel(x - 1, y, z) == 0)
         {
             AddFace(
-                new[] {
+                [
                     position + new System.Numerics.Vector3(-halfSize, -halfSize, halfSize),  // back bottom left (8)
                     position + new System.Numerics.Vector3(-halfSize, -halfSize, -halfSize), // front bottom left (9)
                     position + new System.Numerics.Vector3(-halfSize, halfSize, halfSize),   // back top left (10)
                     position + new System.Numerics.Vector3(-halfSize, halfSize, -halfSize)   // front top left (11)
-                },
+                ],
                 faceColors[2], // Left face color
                 cameraPosition,
                 vertexOffset,

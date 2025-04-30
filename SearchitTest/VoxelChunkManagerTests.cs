@@ -68,8 +68,8 @@ public class VoxelChunkManagerTests
     public void LoadChunk_ExistingPosition_ReturnsSameChunk()
     {
         // Arrange
-        VoxelChunkManager manager = new VoxelChunkManager(_testChunkDirectory);
-        Vector3 chunkPos = new Vector3(0, 0, 0);
+        VoxelChunkManager manager = new(_testChunkDirectory);
+        Vector3 chunkPos = new(0, 0, 0);
         VoxelChunk? firstChunk = manager.LoadChunk(chunkPos);
         Assert.That(firstChunk, Is.Not.Null);
         
@@ -145,7 +145,7 @@ public class VoxelChunkManagerTests
         Assert.That(manager.IsChunkLoaded(initialChunkPos), Is.False);
         
         // New chunks around the player should be loaded
-        Vector3 newChunkPos = new Vector3(
+        Vector3 newChunkPos = new(
             MathF.Floor(newPlayerPos.X / VoxelChunk.ChunkSize) * VoxelChunk.ChunkSize,
             MathF.Floor(newPlayerPos.Y / VoxelChunk.ChunkSize) * VoxelChunk.ChunkSize,
             MathF.Floor(newPlayerPos.Z / VoxelChunk.ChunkSize) * VoxelChunk.ChunkSize
@@ -157,9 +157,9 @@ public class VoxelChunkManagerTests
     public void GetLoadedChunks_ReturnsAllLoadedChunks()
     {
         // Arrange
-        VoxelChunkManager manager = new VoxelChunkManager(_testChunkDirectory);
-        Vector3 pos1 = new Vector3(0, 0, 0);
-        Vector3 pos2 = new Vector3(32, 0, 0);
+        VoxelChunkManager manager = new(_testChunkDirectory);
+        Vector3 pos1 = new(0, 0, 0);
+        Vector3 pos2 = new(32, 0, 0);
         manager.LoadChunk(pos1);
         manager.LoadChunk(pos2);
         
@@ -176,8 +176,8 @@ public class VoxelChunkManagerTests
     public void GetVoxelAt_ExistingChunk_ReturnsCorrectVoxel()
     {
         // Arrange
-        VoxelChunkManager manager = new VoxelChunkManager(_testChunkDirectory);
-        Vector3 chunkPos = new Vector3(0, 0, 0);
+        VoxelChunkManager manager = new(_testChunkDirectory);
+        Vector3 chunkPos = new(0, 0, 0);
         VoxelChunk? chunk = manager.LoadChunk(chunkPos);
         
         // Ensure chunk is not null
