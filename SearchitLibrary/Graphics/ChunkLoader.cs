@@ -12,14 +12,14 @@ public class ChunkLoader
     // Offsets for the 8 sections in a GOX file
     private static readonly Vector3[] _offsets =
     {
-        new(0, 1, 0), // section 1
-        new(1, 1, 0), // section 2
+        new(0, 0, 1), // section 1
+        new(1, 0, 1), // section 2 
         new(1, 0, 0), // section 4
         new(0, 0, 0), // section 3
-        new(0, 0, 1), // section 5
+        new(0, 1, 0), // section 5
         new(0, 1, 1), // section 6
         new(1, 1, 1), // section 7
-        new(1, 0, 1)  // section 8
+        new(1, 1, 0)  // section 8
     };
 
     // Color mapping based on the colors in the Test.txt file
@@ -156,9 +156,9 @@ public class ChunkLoader
         int posIndex = coordX + 64 * coordY;
         int px = posIndex % 16;
         posIndex /= 16;
-        int py = posIndex % 16;
+        int pz = posIndex % 16;
         posIndex /= 16;
-        int pz = posIndex;
+        int py = posIndex;
 
         // Apply the section offset
         Vector3 offset = _offsets[sectionIndex];
@@ -200,7 +200,7 @@ public class ChunkLoader
         }
     }
     
-    private static byte MapColorToVoxelType(int color)
+    public static byte MapColorToVoxelType(int color)
     {
         // Try to get the exact color match
         if (_colorMap.TryGetValue(color, out byte voxelType))
@@ -249,13 +249,13 @@ public class ChunkLoader
         // Iterate through coordinates to create a box pattern
         for (int x = 0; x < VoxelChunk.ChunkSize; x++)
         {
-            for (int y = 0; y < VoxelChunk.ChunkSize; y++)
+            for (int z = 0; z < VoxelChunk.ChunkSize; z++)
             {
-                for (int z = 0; z < VoxelChunk.ChunkSize; z++)
+                for (int y = 0; y < VoxelChunk.ChunkSize; y++)
                 {
-                    // Calculate index using the reference formula: y * ChunkSize * ChunkSize + z * ChunkSize + x
-                    int index = y * VoxelChunk.ChunkSize * VoxelChunk.ChunkSize + 
-                                z * VoxelChunk.ChunkSize + 
+                    // Calculate index using the reference formula: z * ChunkSize * ChunkSize + y * ChunkSize + x
+                    int index = z * VoxelChunk.ChunkSize * VoxelChunk.ChunkSize + 
+                                y * VoxelChunk.ChunkSize + 
                                 x;
                     
                     // Check if this voxel is part of our test pattern (a hollow box)

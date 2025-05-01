@@ -105,7 +105,7 @@ public class VoxelChunkTests
         
         // Assert
         // Expected: x * ChunkSize² + y * ChunkSize + z
-        int expected = x * VoxelChunk.ChunkSize * VoxelChunk.ChunkSize + y * VoxelChunk.ChunkSize + z;
+        int expected = z * VoxelChunk.ChunkSize * VoxelChunk.ChunkSize + y * VoxelChunk.ChunkSize + x;
         Assert.That(index, Is.EqualTo(expected));
     }
     

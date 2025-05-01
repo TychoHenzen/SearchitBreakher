@@ -100,17 +100,11 @@ public static class GoxFileTests
             int z = int.Parse(values[2]);
             int color = Convert.ToInt32(values[3], 16);
             
-            // Apply the same coordinate swapping as in the reference implementation
-            int tmp = x;
-            x = y;
-            y = z;
-            z = tmp;
             
             // Calculate index using our updated formula
             int index = VoxelChunk.GetIndex(x, y, z);
             
-            // Map color to voxel type (use a simple mapping for demonstration)
-            byte voxelType = MapColorToVoxelType(color);
+            byte voxelType = ChunkLoader.MapColorToVoxelType(color);
             
             // Set the voxel value
             if (index >= 0 && index < voxels.Length)
@@ -122,23 +116,4 @@ public static class GoxFileTests
         return voxels;
     }
     
-    /// <summary>
-    /// Maps a color code to a voxel type, similar to the reference implementation's HexConvert
-    /// </summary>
-    private static byte MapColorToVoxelType(int color)
-    {
-        // This is a simplified version - in a real implementation,
-        // this should match the HexConvert.Converter from the reference code
-        switch (color & 0x00FFFFFF)
-        {
-            case 0xFF0000: return 1; // Red
-            case 0x00FF00: return 2; // Green
-            case 0x0000FF: return 3; // Blue
-            case 0xFFFF00: return 4; // Yellow
-            case 0x00FFFF: return 5; // Cyan
-            case 0xFF00FF: return 6; // Magenta
-            case 0xFFFFFF: return 0; // White/Empty
-            default: return 0;
-        }
-    }
 }

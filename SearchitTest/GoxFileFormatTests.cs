@@ -44,6 +44,16 @@ public class GoxFileFormatTests
         byte[] textVoxels = LoadVoxelTextFile(textFilePath);
         VoxelChunk goxChunk = ChunkLoader.LoadGoxFile(goxFilePath, Vector3.Zero);
         byte[] goxVoxels = goxChunk.GetVoxelData();
+
+        // Output non-zero voxels from GOX file
+        for (int i = 0; i < goxVoxels.Length; i++)
+        {
+            if (goxVoxels[i] > 0)
+            {
+                Vector3 pos = VoxelChunk.GetPosition(i);
+                Console.WriteLine($"Loaded from GOX: [{pos.X}, {pos.Y}, {pos.Z}]: {goxVoxels[i]}");
+            }
+        }
         
         // Count non-zero voxels to ensure we're loading something
         int textNonZeroCount = textVoxels.Count(v => v > 0);
@@ -87,7 +97,7 @@ public class GoxFileFormatTests
             }
             
             Console.WriteLine($"Found {differenceCount} differences:");
-            Console.WriteLine();
+            Console.WriteLine(diffBuilder.ToString());
         }
         
         Assert.That(areEqual, Is.True, "Text file and GOX file should produce the same voxel data");
@@ -119,23 +129,18 @@ public class GoxFileFormatTests
                 
                 // Parse coordinates and color
                 int x = int.Parse(values[0]) + 16;
-                int y = int.Parse(values[1]) + 16;
-                int z = int.Parse(values[2]);
+                int z = int.Parse(values[1]) + 16;
+                int y = int.Parse(values[2]);
                 int color = Convert.ToInt32(values[3], 16);
                 
-                // Apply the same coordinate swapping as in the reference implementation
-                int tmp = x;
-                x = y;
-                y = z;
-                z = tmp;
                 
-                Console.WriteLine($"Loaded from text: [{x}, {y}, {z}]: {color:X}");
+                byte voxelType = MapColorToVoxelType(color);
+                Console.WriteLine($"Loaded from text: [{x}, {y}, {z}]: {voxelType}");
                 
                 // Calculate index using our formula
                 int index = VoxelChunk.GetIndex(x, y, z);
                 
                 // Map color to voxel type
-                byte voxelType = MapColorToVoxelType(color);
                 
                 // Set the voxel value
                 if (index >= 0 && index < voxels.Length)
