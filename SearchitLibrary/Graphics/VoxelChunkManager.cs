@@ -114,7 +114,13 @@ public class VoxelChunkManager
                     // Load the chunk if it's not already loaded
                     if (!_chunks.ContainsKey(chunkPos))
                     {
-                        LoadChunk(chunkPos);
+                        VoxelChunk? loadedChunk = LoadChunk(chunkPos);
+                        
+                        // If LoadChunk returned null, create a test chunk instead
+                        if (loadedChunk == null)
+                        {
+                            _chunks[chunkPos] = VoxelChunk.CreateTestChunk(chunkPos);
+                        }
                     }
                 }
             }
@@ -136,6 +142,7 @@ public class VoxelChunkManager
             UnloadChunk(chunkPos);
         }
     }
+
     
     /// <summary>
     /// Gets all currently loaded chunks.
