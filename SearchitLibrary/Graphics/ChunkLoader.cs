@@ -34,7 +34,7 @@ public class ChunkLoader
         try
         {
             // Initialize voxel data array
-            byte[] voxelData = new byte[VoxelChunk.ChunkSize * VoxelChunk.ChunkSize * VoxelChunk.ChunkSize];
+            byte[] voxelData = new byte[Constants.ChunkSize * Constants.ChunkSize * Constants.ChunkSize];
             
             using (FileStream stream = File.OpenRead(filePath))
             {
@@ -76,11 +76,7 @@ public class ChunkLoader
         catch (Exception ex)
         {
             Console.WriteLine($"Error loading .gox file: {ex.Message}");
-            
-            // Create an empty chunk with test pattern instead of throwing an exception
-            byte[] voxelData = new byte[VoxelChunk.ChunkSize * VoxelChunk.ChunkSize * VoxelChunk.ChunkSize];
-            Helpers.CreateTestPattern(voxelData);
-            return new VoxelChunk(position, voxelData);
+            return null;
         }
     }
     
@@ -178,7 +174,7 @@ public class ChunkLoader
         }
         
         // Calculate the index in the voxel array
-        int voxelIndex = VoxelChunk.GetIndex(vx, vy, vz);
+        int voxelIndex = Helpers.GetIndex(vx, vy, vz);
         
         // Set the voxel data if the index is valid
         if (voxelIndex >= 0 && voxelIndex < voxelData.Length)

@@ -75,4 +75,28 @@ public class VoxelShader
         
         return shadedColor;
     }
+    
+    /// <summary>
+    /// Applies distance-based shading to an array of vertices based on their position and color.
+    /// </summary>
+    /// <param name="vertices">The vertices to shade</param>
+    /// <param name="colors">The original colors of the vertices</param>
+    /// <param name="cameraPosition">The position of the camera</param>
+    /// <returns>An array of shaded colors</returns>
+    public Vector3[] ApplyDistanceShadingBatch(Vector3[] vertices, Vector3[] colors, Vector3 cameraPosition)
+    {
+        if (vertices.Length != colors.Length)
+        {
+            throw new ArgumentException("Vertices and colors arrays must have the same length");
+        }
+        
+        Vector3[] shadedColors = new Vector3[colors.Length];
+        
+        for (int i = 0; i < vertices.Length; i++)
+        {
+            shadedColors[i] = ApplyDistanceShading(colors[i], vertices[i], cameraPosition);
+        }
+        
+        return shadedColors;
+    }
 }

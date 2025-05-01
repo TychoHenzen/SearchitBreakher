@@ -5,24 +5,21 @@ namespace SearchitLibrary.Graphics;
 
 public class VoxelChunk
 {
-    public const int ChunkSize = 32;
     private readonly byte[] _voxelData;
     public Vector3 Position { get; }
     
-    // Total number of voxels in the chunk
-    public int VoxelCount => ChunkSize * ChunkSize * ChunkSize;
     
     public VoxelChunk(Vector3 position)
     {
         Position = position;
-        _voxelData = new byte[VoxelCount];
+        _voxelData = new byte[Constants.VoxelCount];
     }
     
     public VoxelChunk(Vector3 position, byte[] voxelData)
     {
-        if (voxelData.Length != VoxelCount)
+        if (voxelData.Length != Constants.VoxelCount)
         {
-            throw new ArgumentException($"Voxel data must contain exactly {VoxelCount} elements", nameof(voxelData));
+            throw new ArgumentException($"Voxel data must contain exactly {Constants.VoxelCount} elements", nameof(voxelData));
         }
         
         Position = position;
@@ -32,23 +29,23 @@ public class VoxelChunk
     // Gets the voxel type at the specified position
     public byte GetVoxel(int x, int y, int z)
     {
-        if (x < 0 || x >= ChunkSize || y < 0 || y >= ChunkSize || z < 0 || z >= ChunkSize)
+        if (x < 0 || x >= Constants.ChunkSize || y < 0 || y >= Constants.ChunkSize || z < 0 || z >= Constants.ChunkSize)
         {
             return 0; // Return empty voxel for out-of-bounds
         }
         
-        return _voxelData[GetIndex(x, y, z)];
+        return _voxelData[Helpers.GetIndex(x, y, z)];
     }
     
     // Sets the voxel type at the specified position
     public void SetVoxel(int x, int y, int z, byte value)
     {
-        if (x < 0 || x >= ChunkSize || y < 0 || y >= ChunkSize || z < 0 || z >= ChunkSize)
+        if (x < 0 || x >= Constants.ChunkSize || y < 0 || y >= Constants.ChunkSize || z < 0 || z >= Constants.ChunkSize)
         {
             return; // Ignore out-of-bounds
         }
         
-        _voxelData[GetIndex(x, y, z)] = value;
+        _voxelData[Helpers.GetIndex(x, y, z)] = value;
     }
     
     // Gets a voxel at the specified local position
@@ -71,30 +68,7 @@ public class VoxelChunk
         SetVoxel(x, y, z, value);
     }
     
-    // Converts coordinates to an index in the data array
-    public static int GetIndex(int x, int y, int z)
-    {
-        // Ensure coordinates are within bounds
-        x = Math.Clamp(x, 0, ChunkSize - 1);
-        y = Math.Clamp(y, 0, ChunkSize - 1);
-        z = Math.Clamp(z, 0, ChunkSize - 1);
-        
-        // Using z-major ordering for MonoGame coordinate system
-        return z * ChunkSize * ChunkSize + y * ChunkSize + x;
-    }
     
-    // Converts an index back to coordinates
-    public static Vector3 GetPosition(int index)
-    {
-        // Match the updated GetIndex formula by reversing it
-        int x = index % ChunkSize;
-        index /= ChunkSize;
-        int y = index % ChunkSize;
-        index /= ChunkSize;
-        int z = index;
-        
-        return new Vector3(x, y, z);
-    }
     
     // Gets all voxel data as an array
     public byte[] GetVoxelData()
@@ -105,55 +79,4 @@ public class VoxelChunk
         return copy;
     }
     
-    // Creates a test chunk with a pattern for debugging
-    public static VoxelChunk CreateTestChunk(Vector3 position)
-    {
-        VoxelChunk chunk = new(position);
-        
-        // Create a simple pattern - a hollow box in the center
-        int centerStart = ChunkSize / 4;
-        int centerEnd = ChunkSize - centerStart;
-        
-        for (int x = centerStart; x < centerEnd; x++)
-        {
-            for (int z = centerStart; z < centerEnd; z++)
-            {
-                for (int y = centerStart; y < centerEnd; y++)
-                {
-                    // Set voxels in the outer shell only
-                    if (x == centerStart || x == centerEnd - 1 ||
-                        y == centerStart || y == centerEnd - 1 ||
-                        z == centerStart || z == centerEnd - 1)
-                    {
-                        // Use different colors for each face to make them distinguishable
-                        byte value = 1; // Default
-                        
-                        // Assign colors based on which face the voxel belongs to
-                        // Front face (negative Z)
-                        if (z == centerStart)
-                            value = 1; // Red
-                        // Back face (positive Z)
-                        else if (z == centerEnd - 1)
-                            value = 2; // Green
-                        // Left face (negative X)
-                        else if (x == centerStart)
-                            value = 3; // Blue
-                        // Right face (positive X)
-                        else if (x == centerEnd - 1)
-                            value = 4; // Yellow
-                        // Top face (positive Y)
-                        else if (y == centerEnd - 1)
-                            value = 5; // Cyan
-                        // Bottom face (negative Y)
-                        else if (y == centerStart)
-                            value = 6; // Magenta
-                        
-                        chunk.SetVoxel(x, y, z, value);
-                    }
-                }
-            }
-        }
-        
-        return chunk;
-    }
 }

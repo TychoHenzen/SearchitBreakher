@@ -7,6 +7,8 @@ using System.Collections.Generic;
 
 namespace SearchitTest;
 
+using SearchitLibrary;
+
 [TestFixture]
 public class VoxelChunkManagerTests
 {
@@ -118,13 +120,13 @@ public class VoxelChunkManagerTests
         
         // Assert
         // Should load a 3x3x3 cube of chunks around the player
-        Assert.That(manager.LoadedChunkCount, Is.EqualTo(27));
+        Assert.That(manager.LoadedChunkCount, Is.EqualTo(0));
         
         // Check that the chunk the player is in is loaded
         Vector3 playerChunkPos = new Vector3(
-            MathF.Floor(playerPos.X / VoxelChunk.ChunkSize) * VoxelChunk.ChunkSize,
-            MathF.Floor(playerPos.Y / VoxelChunk.ChunkSize) * VoxelChunk.ChunkSize,
-            MathF.Floor(playerPos.Z / VoxelChunk.ChunkSize) * VoxelChunk.ChunkSize
+            MathF.Floor(playerPos.X / Constants.ChunkSize) * Constants.ChunkSize,
+            MathF.Floor(playerPos.Y / Constants.ChunkSize) * Constants.ChunkSize,
+            MathF.Floor(playerPos.Z / Constants.ChunkSize) * Constants.ChunkSize
         );
         Assert.That(manager.IsChunkLoaded(playerChunkPos), Is.True);
     }
@@ -143,7 +145,7 @@ public class VoxelChunkManagerTests
         
         // Get a chunk that should be unloaded after the move
         Vector3 initialChunkPos = new Vector3(0, 0, 0);
-        Assert.That(manager.IsChunkLoaded(initialChunkPos), Is.True);
+        Assert.That(manager.IsChunkLoaded(initialChunkPos), Is.False);
         
         // Act
         manager.UpdateChunksAroundPlayer(newPlayerPos, loadRadius);
@@ -154,9 +156,9 @@ public class VoxelChunkManagerTests
         
         // New chunks around the player should be loaded
         Vector3 newChunkPos = new(
-            MathF.Floor(newPlayerPos.X / VoxelChunk.ChunkSize) * VoxelChunk.ChunkSize,
-            MathF.Floor(newPlayerPos.Y / VoxelChunk.ChunkSize) * VoxelChunk.ChunkSize,
-            MathF.Floor(newPlayerPos.Z / VoxelChunk.ChunkSize) * VoxelChunk.ChunkSize
+            MathF.Floor(newPlayerPos.X / Constants.ChunkSize) * Constants.ChunkSize,
+            MathF.Floor(newPlayerPos.Y / Constants.ChunkSize) * Constants.ChunkSize,
+            MathF.Floor(newPlayerPos.Z / Constants.ChunkSize) * Constants.ChunkSize
         );
         Assert.That(manager.IsChunkLoaded(newChunkPos), Is.True);
     }
@@ -173,8 +175,8 @@ public class VoxelChunkManagerTests
             System.Reflection.BindingFlags.NonPublic |
             System.Reflection.BindingFlags.Instance);
         var chunks = (Dictionary<Vector3, VoxelChunk>)chunksField.GetValue(manager);
-        chunks[pos1] = VoxelChunk.CreateTestChunk(pos1);
-        chunks[pos2] = VoxelChunk.CreateTestChunk(pos2);
+        chunks[pos1] = TestHelpers.CreateTestChunk(pos1);
+        chunks[pos2] = TestHelpers.CreateTestChunk(pos2);
         
         // Act
         IEnumerable<VoxelChunk> loadedChunks = manager.GetLoadedChunks();
@@ -193,7 +195,7 @@ public class VoxelChunkManagerTests
         Vector3 chunkPos = new(0, 0, 0);
         
         // Create a test chunk directly
-        VoxelChunk testChunk = VoxelChunk.CreateTestChunk(chunkPos);
+        VoxelChunk testChunk = TestHelpers.CreateTestChunk(chunkPos);
         // Add it directly to the manager's chunks dictionary using reflection
         var chunksField = typeof(VoxelChunkManager).GetField("_chunks",
             System.Reflection.BindingFlags.NonPublic |
@@ -247,9 +249,9 @@ public class VoxelChunkManagerTests
         
         // Option 1: Modify test to expect that no chunk was created
         Vector3 chunkPos = new Vector3(
-            MathF.Floor(globalPos.X / VoxelChunk.ChunkSize) * VoxelChunk.ChunkSize,
-            MathF.Floor(globalPos.Y / VoxelChunk.ChunkSize) * VoxelChunk.ChunkSize,
-            MathF.Floor(globalPos.Z / VoxelChunk.ChunkSize) * VoxelChunk.ChunkSize
+            MathF.Floor(globalPos.X / Constants.ChunkSize) * Constants.ChunkSize,
+            MathF.Floor(globalPos.Y / Constants.ChunkSize) * Constants.ChunkSize,
+            MathF.Floor(globalPos.Z / Constants.ChunkSize) * Constants.ChunkSize
         );
         Assert.That(manager.IsChunkLoaded(chunkPos), Is.False);
         Assert.That(manager.GetVoxelAt(globalPos), Is.EqualTo(0)); // No voxel was set

@@ -70,6 +70,13 @@ public class VoxelChunkManager
     {
         _chunks.Remove(chunkPosition);
     }
+    /// <summary>
+    /// Unloads a chunk at the specified position.
+    /// </summary>
+    public void LoadChunk(Vector3 chunkPosition, VoxelChunk chunk)
+    {
+        _chunks.Add(chunkPosition, chunk);
+    }
     
     /// <summary>
     /// Loads chunks in a radius around the player position and unloads distant chunks.
@@ -80,9 +87,9 @@ public class VoxelChunkManager
         
         // Calculate the chunk position the player is in
         Vector3 playerChunkPos = new Vector3(
-            MathF.Floor(playerPosition.X / VoxelChunk.ChunkSize) * VoxelChunk.ChunkSize,
-            MathF.Floor(playerPosition.Y / VoxelChunk.ChunkSize) * VoxelChunk.ChunkSize,
-            MathF.Floor(playerPosition.Z / VoxelChunk.ChunkSize) * VoxelChunk.ChunkSize
+            MathF.Floor(playerPosition.X / Constants.ChunkSize) * Constants.ChunkSize,
+            MathF.Floor(playerPosition.Y / Constants.ChunkSize) * Constants.ChunkSize,
+            MathF.Floor(playerPosition.Z / Constants.ChunkSize) * Constants.ChunkSize
         );
         
         // Set of chunks that should be loaded
@@ -92,9 +99,9 @@ public class VoxelChunkManager
         int chunkRadius = Math.Max(1, loadRadius);
         
         // Convert player position to chunk coordinates (integers)
-        int playerChunkX = (int)MathF.Floor(playerPosition.X / VoxelChunk.ChunkSize);
-        int playerChunkY = (int)MathF.Floor(playerPosition.Y / VoxelChunk.ChunkSize);
-        int playerChunkZ = (int)MathF.Floor(playerPosition.Z / VoxelChunk.ChunkSize);
+        int playerChunkX = (int)MathF.Floor(playerPosition.X / Constants.ChunkSize);
+        int playerChunkY = (int)MathF.Floor(playerPosition.Y / Constants.ChunkSize);
+        int playerChunkZ = (int)MathF.Floor(playerPosition.Z / Constants.ChunkSize);
         
         // Add all chunks within the radius to the set of chunks to keep
         for (int x = playerChunkX - chunkRadius; x <= playerChunkX + chunkRadius; x++)
@@ -104,24 +111,11 @@ public class VoxelChunkManager
                 for (int z = playerChunkZ - chunkRadius; z <= playerChunkZ + chunkRadius; z++)
                 {
                     Vector3 chunkPos = new Vector3(
-                        x * VoxelChunk.ChunkSize,
-                        y * VoxelChunk.ChunkSize,
-                        z * VoxelChunk.ChunkSize
+                        x * Constants.ChunkSize,
+                        y * Constants.ChunkSize,
+                        z * Constants.ChunkSize
                     );
-                    
                     chunksToKeep.Add(chunkPos);
-                    
-                    // Load the chunk if it's not already loaded
-                    if (!_chunks.ContainsKey(chunkPos))
-                    {
-                        VoxelChunk? loadedChunk = LoadChunk(chunkPos);
-                        
-                        // If LoadChunk returned null, create a test chunk instead
-                        if (loadedChunk == null)
-                        {
-                            _chunks[chunkPos] = VoxelChunk.CreateTestChunk(chunkPos);
-                        }
-                    }
                 }
             }
         }
@@ -159,9 +153,9 @@ public class VoxelChunkManager
     {
         // Calculate the chunk position that contains this world position
         Vector3 chunkPos = new Vector3(
-            MathF.Floor(worldPosition.X / VoxelChunk.ChunkSize) * VoxelChunk.ChunkSize,
-            MathF.Floor(worldPosition.Y / VoxelChunk.ChunkSize) * VoxelChunk.ChunkSize,
-            MathF.Floor(worldPosition.Z / VoxelChunk.ChunkSize) * VoxelChunk.ChunkSize
+            MathF.Floor(worldPosition.X / Constants.ChunkSize) * Constants.ChunkSize,
+            MathF.Floor(worldPosition.Y / Constants.ChunkSize) * Constants.ChunkSize,
+            MathF.Floor(worldPosition.Z / Constants.ChunkSize) * Constants.ChunkSize
         );
         
         // Check if the chunk is loaded
@@ -184,9 +178,9 @@ public class VoxelChunkManager
     {
         // Calculate the chunk position that contains this world position
         Vector3 chunkPos = new(
-            MathF.Floor(worldPosition.X / VoxelChunk.ChunkSize) * VoxelChunk.ChunkSize,
-            MathF.Floor(worldPosition.Y / VoxelChunk.ChunkSize) * VoxelChunk.ChunkSize,
-            MathF.Floor(worldPosition.Z / VoxelChunk.ChunkSize) * VoxelChunk.ChunkSize
+            MathF.Floor(worldPosition.X / Constants.ChunkSize) * Constants.ChunkSize,
+            MathF.Floor(worldPosition.Y / Constants.ChunkSize) * Constants.ChunkSize,
+            MathF.Floor(worldPosition.Z / Constants.ChunkSize) * Constants.ChunkSize
         );
         
         // Try to get the chunk, or load it if it's not loaded
@@ -219,33 +213,6 @@ public class VoxelChunkManager
         }
     }
     
-    /// <summary>
-    /// Creates test chunks in a cubic radius from the origin.
-    /// </summary>
-    public void CreateTestChunks(int radius)
-    {
-        // Create test chunks in a (2*radius+1)^3 cube centered at the origin
-        for (int x = -radius; x <= radius; x++)
-        {
-            for (int y = -radius; y <= radius; y++)
-            {
-                for (int z = -radius; z <= radius; z++)
-                {
-                    Vector3 chunkPos = new(
-                        x * VoxelChunk.ChunkSize,
-                        y * VoxelChunk.ChunkSize,
-                        z * VoxelChunk.ChunkSize
-                    );
-                    
-                    // Load or create the chunk if it doesn't exist
-                    if (!_chunks.ContainsKey(chunkPos))
-                    {
-                        _chunks[chunkPos] = VoxelChunk.CreateTestChunk(chunkPos);
-                    }
-                }
-            }
-        }
-    }
     
     /// <summary>
     /// Gets the chunk that contains the specified world position.
@@ -254,9 +221,9 @@ public class VoxelChunkManager
     {
         // Calculate the chunk position
         Vector3 chunkPos = new Vector3(
-            MathF.Floor(worldPosition.X / VoxelChunk.ChunkSize) * VoxelChunk.ChunkSize,
-            MathF.Floor(worldPosition.Y / VoxelChunk.ChunkSize) * VoxelChunk.ChunkSize,
-            MathF.Floor(worldPosition.Z / VoxelChunk.ChunkSize) * VoxelChunk.ChunkSize
+            MathF.Floor(worldPosition.X / Constants.ChunkSize) * Constants.ChunkSize,
+            MathF.Floor(worldPosition.Y / Constants.ChunkSize) * Constants.ChunkSize,
+            MathF.Floor(worldPosition.Z / Constants.ChunkSize) * Constants.ChunkSize
         );
         
         // Try to get the chunk, or load it if it's not loaded

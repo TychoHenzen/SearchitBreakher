@@ -1,5 +1,7 @@
 namespace SearchitLibrary.Graphics;
 
+using System.Numerics;
+
 public static class Helpers
 {
 	// Color mapping based on the colors in the Test.txt file
@@ -15,6 +17,31 @@ public static class Helpers
 		{ 0xCC33CC, 8 }, // Magenta
 		{ 0xFFFFFF, 0 }  // White (empty)
 	};
+	
+	// Converts coordinates to an index in the data array
+	public static int GetIndex(int x, int y, int z)
+	{
+		// Ensure coordinates are within bounds
+		x = Math.Clamp(x, 0, Constants.ChunkSize - 1);
+		y = Math.Clamp(y, 0, Constants.ChunkSize - 1);
+		z = Math.Clamp(z, 0, Constants.ChunkSize - 1);
+		
+		// Using z-major ordering for MonoGame coordinate system
+		return z * Constants.ChunkSize * Constants.ChunkSize + y * Constants.ChunkSize + x;
+	}
+	
+	// Converts an index back to coordinates
+	public static Vector3 GetPosition(int index)
+	{
+		// Match the updated GetIndex formula by reversing it
+		int x = index % Constants.ChunkSize;
+		index /= Constants.ChunkSize;
+		int y = index % Constants.ChunkSize;
+		index /= Constants.ChunkSize;
+		int z = index;
+		
+		return new Vector3(x, y, z);
+	}
 	public static byte MapColorToVoxelType(this int color)
 	{
 		// Try to get the exact color match
@@ -48,70 +75,5 @@ public static class Helpers
 		}
 		
 		return _colorMap[closestColor];
-	}
-	public static void CreateTestPattern(this byte[] voxelData)
-	{
-		// Create a simple test pattern - a box in the center
-		int centerStart = VoxelChunk.ChunkSize / 4;
-		int centerEnd = VoxelChunk.ChunkSize - centerStart;
-		
-		// Clear the array first to ensure we start with a clean slate
-		for (int i = 0; i < voxelData.Length; i++)
-		{
-			voxelData[i] = 0;
-		}
-		
-		// Iterate through coordinates to create a box pattern
-		for (int x = 0; x < VoxelChunk.ChunkSize; x++)
-		{
-			for (int z = 0; z < VoxelChunk.ChunkSize; z++)
-			{
-				for (int y = 0; y < VoxelChunk.ChunkSize; y++)
-				{
-					// Calculate index using the reference formula: z * ChunkSize * ChunkSize + y * ChunkSize + x
-					int index = z * VoxelChunk.ChunkSize * VoxelChunk.ChunkSize +
-					            y * VoxelChunk.ChunkSize +
-					            x;
-					
-					// Check if this voxel is part of our test pattern (a hollow box)
-					if (x >= centerStart && x < centerEnd &&
-					    y >= centerStart && y < centerEnd &&
-					    z >= centerStart && z < centerEnd)
-					{
-						// Set voxels in the outer shell only
-						if (x == centerStart || x == centerEnd - 1 ||
-						    y == centerStart || y == centerEnd - 1 ||
-						    z == centerStart || z == centerEnd - 1)
-						{
-							// Use different colors for each face to make them distinguishable
-							byte value = 1; // Default
-							
-							// Assign colors based on which face the voxel belongs to
-							// Front face (negative Z)
-							if (z == centerStart)
-								value = 1; // Red
-							// Back face (positive Z)
-							else if (z == centerEnd - 1)
-								value = 2; // Green
-							// Left face (negative X)
-							else if (x == centerStart)
-								value = 3; // Blue
-							// Right face (positive X)
-							else if (x == centerEnd - 1)
-								value = 4; // Yellow
-							// Top face (positive Y)
-							else if (y == centerEnd - 1)
-								value = 5; // Cyan
-							// Bottom face (negative Y)
-							else if (y == centerStart)
-								value = 6; // Magenta
-							
-							// Set the voxel value
-							voxelData[index] = value;
-						}
-					}
-				}
-			}
-		}
 	}
 }

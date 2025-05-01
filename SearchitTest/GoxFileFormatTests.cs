@@ -9,6 +9,8 @@ using System.Text;
 
 namespace SearchitTest;
 
+using SearchitLibrary;
+
 [TestFixture]
 public class GoxFileFormatTests
 {
@@ -50,7 +52,7 @@ public class GoxFileFormatTests
         {
             if (goxVoxels[i] > 0)
             {
-                Vector3 pos = VoxelChunk.GetPosition(i);
+                Vector3 pos = Helpers.GetPosition(i);
                 Console.WriteLine($"Loaded from GOX: [{pos.X}, {pos.Y}, {pos.Z}]: {goxVoxels[i]}");
             }
         }
@@ -76,7 +78,7 @@ public class GoxFileFormatTests
                 if (textVoxels[i] != goxVoxels[i] && (textVoxels[i] > 0 || goxVoxels[i] > 0))
                 {
                     // Only log differences where either file has a non-zero value
-                    Vector3 pos = VoxelChunk.GetPosition(i);
+                    Vector3 pos = Helpers.GetPosition(i);
                     diffBuilder.AppendLine(
                         $"Difference at index {i} [x={pos.X}, y={pos.Y}, z={pos.Z}]: TextVoxels = {textVoxels[i]}, GoxVoxels = {goxVoxels[i]}");
                     differenceCount++;
@@ -109,7 +111,7 @@ public class GoxFileFormatTests
     private byte[] LoadVoxelTextFile(string filePath)
     {
         // Initialize voxel data array (32x32x32)
-        byte[] voxels = new byte[VoxelChunk.ChunkSize * VoxelChunk.ChunkSize * VoxelChunk.ChunkSize];
+        byte[] voxels = new byte[Constants.ChunkSize * Constants.ChunkSize * Constants.ChunkSize];
         
         try
         {
@@ -138,7 +140,7 @@ public class GoxFileFormatTests
                 Console.WriteLine($"Loaded from text: [{x}, {y}, {z}]: {voxelType}");
                 
                 // Calculate index using our formula
-                int index = VoxelChunk.GetIndex(x, y, z);
+                int index = Helpers.GetIndex(x, y, z);
                 
                 // Map color to voxel type
                 

@@ -46,7 +46,7 @@ public static class GoxFileTests
                     // Only log the first 100 differences to avoid excessive output
                     if (differenceCount < 100)
                     {
-                        Vector3 pos = VoxelChunk.GetPosition(i);
+                        Vector3 pos = Helpers.GetPosition(i);
                         diffBuilder.AppendLine(
                             $"Difference at index {i} [x={pos.X}, y={pos.Y}, z={pos.Z}]: TextVoxels = {textVoxels[i]}, GoxVoxels = {goxVoxels[i]}");
                     }
@@ -78,7 +78,7 @@ public static class GoxFileTests
     private static byte[] LoadVoxelTextFile(string filePath)
     {
         // Initialize voxel data array (32x32x32)
-        byte[] voxels = new byte[VoxelChunk.ChunkSize * VoxelChunk.ChunkSize * VoxelChunk.ChunkSize];
+        byte[] voxels = new byte[Constants.ChunkSize * Constants.ChunkSize * Constants.ChunkSize];
         
         // Read the text file
         string[] lines = File.ReadAllLines(filePath);
@@ -102,7 +102,7 @@ public static class GoxFileTests
             
             
             // Calculate index using our updated formula
-            int index = VoxelChunk.GetIndex(x, y, z);
+            int index = Helpers.GetIndex(x, y, z);
             
             byte voxelType = color.MapColorToVoxelType();
             

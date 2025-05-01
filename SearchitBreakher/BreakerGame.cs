@@ -70,11 +70,6 @@ public class BreakerGame : Game
         // Initial load of chunks around the starting position
         UpdateLoadedChunks();
         
-        // Also create a test chunk if none are loaded
-        if (_chunkManager.LoadedChunkCount == 0)
-        {
-            _chunkManager.CreateTestChunks(1);
-        }
     }
     
     private void UpdateLoadedChunks()

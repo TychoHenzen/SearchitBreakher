@@ -4,6 +4,8 @@ using System.Numerics;
 
 namespace SearchitTest;
 
+using SearchitLibrary;
+
 [TestFixture]
 public class VoxelChunkTests
 {
@@ -18,7 +20,7 @@ public class VoxelChunkTests
         
         // Assert
         Assert.That(chunk.Position, Is.EqualTo(position));
-        Assert.That(chunk.VoxelCount, Is.EqualTo(VoxelChunk.ChunkSize * VoxelChunk.ChunkSize * VoxelChunk.ChunkSize));
+        Assert.That(Constants.VoxelCount, Is.EqualTo(Constants.ChunkSize * Constants.ChunkSize * Constants.ChunkSize));
     }
     
     [Test]
@@ -26,9 +28,9 @@ public class VoxelChunkTests
     {
         // Arrange
         Vector3 position = new Vector3(32, 0, 0);
-        byte[] voxelData = new byte[VoxelChunk.ChunkSize * VoxelChunk.ChunkSize * VoxelChunk.ChunkSize];
+        byte[] voxelData = new byte[Constants.ChunkSize * Constants.ChunkSize * Constants.ChunkSize];
         // Set a specific voxel
-        int testIndex = VoxelChunk.GetIndex(10, 10, 10);
+        int testIndex = Helpers.GetIndex(10, 10, 10);
         voxelData[testIndex] = 1;
         
         // Act
@@ -61,7 +63,7 @@ public class VoxelChunkTests
         
         // Act
         byte result = chunk.GetVoxel(-1, 0, 0);
-        byte result2 = chunk.GetVoxel(0, VoxelChunk.ChunkSize, 0);
+        byte result2 = chunk.GetVoxel(0, Constants.ChunkSize, 0);
         
         // Assert
         Assert.That(result, Is.EqualTo(0));
@@ -89,7 +91,7 @@ public class VoxelChunkTests
         
         // Act - This should not throw an exception
         chunk.SetVoxel(-1, 0, 0, 5);
-        chunk.SetVoxel(0, VoxelChunk.ChunkSize, 0, 5);
+        chunk.SetVoxel(0, Constants.ChunkSize, 0, 5);
         
         // Assert - Nothing to assert, we're just making sure it doesn't throw
     }
@@ -101,11 +103,11 @@ public class VoxelChunkTests
         int x = 5, y = 10, z = 15;
         
         // Act
-        int index = VoxelChunk.GetIndex(x, y, z);
+        int index = Helpers.GetIndex(x, y, z);
         
         // Assert
         // Expected: x * ChunkSize² + y * ChunkSize + z
-        int expected = z * VoxelChunk.ChunkSize * VoxelChunk.ChunkSize + y * VoxelChunk.ChunkSize + x;
+        int expected = z * Constants.ChunkSize * Constants.ChunkSize + y * Constants.ChunkSize + x;
         Assert.That(index, Is.EqualTo(expected));
     }
     
@@ -114,10 +116,10 @@ public class VoxelChunkTests
     {
         // Arrange
         int x = 5, y = 10, z = 15;
-        int index = VoxelChunk.GetIndex(x, y, z);
+        int index = Helpers.GetIndex(x, y, z);
         
         // Act
-        Vector3 position = VoxelChunk.GetPosition(index);
+        Vector3 position = Helpers.GetPosition(index);
         
         // Assert
         Assert.That(position.X, Is.EqualTo(x));
@@ -132,14 +134,14 @@ public class VoxelChunkTests
         Vector3 position = new Vector3(32, 0, 0);
         
         // Act
-        VoxelChunk chunk = VoxelChunk.CreateTestChunk(position);
+        VoxelChunk chunk = TestHelpers.CreateTestChunk(position);
         
         // Assert
         Assert.That(chunk.Position, Is.EqualTo(position));
         
         // Test a few positions that should be part of the outer shell
-        int centerStart = VoxelChunk.ChunkSize / 4;
-        int centerEnd = VoxelChunk.ChunkSize - centerStart;
+        int centerStart = Constants.ChunkSize / 4;
+        int centerEnd = Constants.ChunkSize - centerStart;
         
         // Front face
         Assert.That(chunk.GetVoxel(centerStart, centerStart, centerStart), Is.EqualTo(1));
