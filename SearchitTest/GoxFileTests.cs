@@ -104,7 +104,7 @@ public static class GoxFileTests
             // Calculate index using our updated formula
             int index = VoxelChunk.GetIndex(x, y, z);
             
-            byte voxelType = ChunkLoader.MapColorToVoxelType(color);
+            byte voxelType = color.MapColorToVoxelType();
             
             // Set the voxel value
             if (index >= 0 && index < voxels.Length)
