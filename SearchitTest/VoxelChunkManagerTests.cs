@@ -120,7 +120,7 @@ public class VoxelChunkManagerTests
         
         // Assert
         // Should load a 3x3x3 cube of chunks around the player
-        Assert.That(manager.LoadedChunkCount, Is.EqualTo(0));
+        Assert.That(manager.LoadedChunkCount, Is.EqualTo(27));
         
         // Check that the chunk the player is in is loaded
         Vector3 playerChunkPos = new Vector3(
@@ -145,7 +145,7 @@ public class VoxelChunkManagerTests
         
         // Get a chunk that should be unloaded after the move
         Vector3 initialChunkPos = new Vector3(0, 0, 0);
-        Assert.That(manager.IsChunkLoaded(initialChunkPos), Is.False);
+        Assert.That(manager.IsChunkLoaded(initialChunkPos), Is.True);
         
         // Act
         manager.UpdateChunksAroundPlayer(newPlayerPos, loadRadius);

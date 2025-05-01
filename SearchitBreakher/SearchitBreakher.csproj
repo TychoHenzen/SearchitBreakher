@@ -27,11 +27,6 @@
         <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.*"/>
     </ItemGroup>
     <ItemGroup>
-      <Content Include="..\CLAUDE.md">
-        <Link>CLAUDE.md</Link>
-      </Content>
-    </ItemGroup>
-    <ItemGroup>
         <ProjectReference Include="..\SearchitLibrary\SearchitLibrary.csproj" />
     </ItemGroup>
     <!-- Add this section to copy voxel files -->
