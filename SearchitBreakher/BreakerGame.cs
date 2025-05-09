@@ -12,7 +12,6 @@ public class BreakerGame : Game
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
     private MonoGameCamera _camera;
-    private VoxelRenderer _voxelRenderer;
     private SpriteFont _font;
     
     // Add chunk management
@@ -34,9 +33,6 @@ public class BreakerGame : Game
         // Initialize the 3D camera
         _camera = new MonoGameCamera(GraphicsDevice);
 
-        // Initialize the voxel renderer
-        _voxelRenderer = new VoxelRenderer(GraphicsDevice, _camera);
-        
         // Initialize chunk renderer manager
         _chunkRendererManager = new ChunkRendererManager(GraphicsDevice, _camera);
 
@@ -94,9 +90,6 @@ public class BreakerGame : Game
         // Update camera with mouse input
         _camera.Update(GraphicsDevice, gameTime);
 
-        // Update voxel renderer with the updated camera 
-        _voxelRenderer.UpdateCamera(_camera);
-        
         // Update chunk renderer manager with the updated camera
         _chunkRendererManager.UpdateCamera(_camera);
         
