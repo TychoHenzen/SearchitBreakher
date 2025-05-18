@@ -1,7 +1,6 @@
 ﻿// CachingConstantProvider.cs
-using SearchitLibrary;
+
 using SearchitLibrary.Abstractions;
-using System;
 
 namespace SearchitLibrary.IO
 {
@@ -20,16 +19,8 @@ namespace SearchitLibrary.IO
 
         public void Save(Constants constants)
         {
-            if (AreEqual(_cached, constants)) return;
-            
             _cached = constants;
             _innerProvider.Save(constants);
-        }
-
-        private static bool AreEqual(Constants a, Constants b)
-        {
-            return Math.Abs(a.LookSpeed - b.LookSpeed) < 0.0001f &&
-                   Math.Abs(a.MoveSpeed - b.MoveSpeed) < 0.0001f;
         }
     }
 }
