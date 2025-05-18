@@ -10,8 +10,8 @@ internal static class Program
 {
     private static void Main()
     {
-        using IHost host = Host.CreateDefaultBuilder()
-            .ConfigureServices((context, services) =>
+        using var host = Host.CreateDefaultBuilder()
+            .ConfigureServices((_, services) =>
             {
                 // Register MonoGame services + your game
                 services.AddSingleton<BreakerGame>();
