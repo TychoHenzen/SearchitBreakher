@@ -1,33 +1,34 @@
 ﻿// BreakerGame.cs (Updated to use ConstantProvider)
 
-using System.IO;
+using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using SearchitBreakher.Graphics;
 using SearchitLibrary.Abstractions;
-using SearchitLibrary.Graphics;
 using Vector3 = System.Numerics.Vector3;
+using Vector2 = System.Numerics.Vector2;
 
 namespace SearchitBreakher;
 
 public class BreakerGame : Game
 {
     private const int LoadRadius = 3;
-    private readonly IConstantProvider _constantProvider;
     private readonly GraphicsDeviceManager _graphics;
-    private MonoGameCamera _camera;
+    private readonly IServiceProvider _sp;
+    private ICamera _camera;
+    private IChunkManager _chunkManager;
+    private IChunkRenderer _chunkRenderer;
+    private IConstantProvider _constantProvider;
 
-    private VoxelChunkManager _chunkManager;
-    private ChunkRendererManager _chunkRendererManager;
     private SpriteFont _font;
     private MouseState _previousMouseState;
 
     private SpriteBatch _spriteBatch;
 
-    public BreakerGame(IConstantProvider constantProvider)
+    public BreakerGame(IServiceProvider sp)
     {
-        _constantProvider = constantProvider;
+        _sp = sp;
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = false;
@@ -36,8 +37,10 @@ public class BreakerGame : Game
 
     protected override void Initialize()
     {
-        _camera = new MonoGameCamera(GraphicsDevice, _constantProvider);
-        _chunkRendererManager = new ChunkRendererManager(GraphicsDevice, _camera);
+        _constantProvider = _sp.GetRequiredService<IConstantProvider>();
+        _camera = _sp.GetRequiredService<ICamera>();
+        _chunkManager = _sp.GetRequiredService<IChunkManager>();
+        _chunkRenderer = _sp.GetRequiredService<IChunkRenderer>();
         CenterMouse();
         _previousMouseState = Mouse.GetState();
 
@@ -48,7 +51,6 @@ public class BreakerGame : Game
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         TryLoadFont();
-        InitializeChunkManagement();
         UpdateLoadedChunks();
     }
 
@@ -63,12 +65,6 @@ public class BreakerGame : Game
         }
     }
 
-    private void InitializeChunkManagement()
-    {
-        var voxelsPath = Path.Combine(Content.RootDirectory, "voxels");
-        _chunkManager = new VoxelChunkManager(voxelsPath);
-        _chunkManager.EnsureChunkDirectoryExists();
-    }
 
     private void CenterMouse()
     {
@@ -104,8 +100,8 @@ public class BreakerGame : Game
             }
         }
 
-        _camera.Update(GraphicsDevice, gameTime);
-        _chunkRendererManager.UpdateCamera(_camera);
+        _camera.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+        _chunkRenderer.UpdateCamera(_camera);
         UpdateLoadedChunks();
 
         base.Update(gameTime);
@@ -122,10 +118,9 @@ public class BreakerGame : Game
     {
         ClearScreen();
 
-        var frustum = new BoundingFrustum(
-            _camera.GetViewMatrix() * _camera.GetProjectionMatrix());
+        var projection = _camera.GetViewMatrix() * _camera.GetProjectionMatrix();
 
-        _chunkRendererManager.RenderVisibleChunks(_chunkManager, frustum);
+        _chunkRenderer.RenderVisibleChunks(_chunkManager, projection);
         DrawUI();
 
         base.Draw(gameTime);
@@ -144,9 +139,9 @@ public class BreakerGame : Game
         GraphicsDevice.DepthStencilState = DepthStencilState.None;
         _spriteBatch.Begin();
 
-        _spriteBatch.DrawString(_font, $"Look Speed: {_camera.Constants.LookSpeed:F2} ([/] to adjust)",
+        _spriteBatch.DrawString(_font, $"Look Speed: {_constantProvider.Get().LookSpeed:F2} ([/] to adjust)",
             new Vector2(10, 10), Color.White);
-        _spriteBatch.DrawString(_font, $"Move Speed: {_camera.Constants.MoveSpeed:F2} (-/+ to adjust)",
+        _spriteBatch.DrawString(_font, $"Move Speed: {_constantProvider.Get().MoveSpeed:F2} (-/+ to adjust)",
             new Vector2(10, 30), Color.White);
         _spriteBatch.DrawString(_font, "WASD: Move, Mouse: Look, Space/C: Up/Down", new Vector2(10, 50), Color.White);
         _spriteBatch.DrawString(_font,
@@ -156,7 +151,7 @@ public class BreakerGame : Game
             $"Distance to Origin: {Microsoft.Xna.Framework.Vector3.Distance(_camera.Position, Microsoft.Xna.Framework.Vector3.Zero):F2} units",
             new Vector2(10, 90), Color.Yellow);
         _spriteBatch.DrawString(_font,
-            $"Loaded Chunks: {_chunkManager.LoadedChunkCount} | Rendered: {_chunkRendererManager.RendererCount}",
+            $"Loaded Chunks: {_chunkManager.LoadedChunkCount} | Rendered: {_chunkRenderer.RendererCount}",
             new Vector2(10, 110), Color.LightGreen);
         _spriteBatch.DrawString(_font,
             "Front: Red | Back: Green | Left: Blue | Right: Yellow | Top: Magenta | Bottom: Cyan", new Vector2(10, 130),

@@ -2,9 +2,12 @@
 using System.IO;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using SearchitBreakher;
+using SearchitBreakher.Graphics;
 using SearchitLibrary.Abstractions;
+using SearchitLibrary.Graphics;
 using SearchitLibrary.IO;
+
+namespace SearchitBreakher;
 
 internal static class Program
 {
@@ -16,11 +19,27 @@ internal static class Program
                 // Register MonoGame services + your game
                 services.AddSingleton<BreakerGame>();
 
+
                 var constantsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "constants.json");
-                IConstantProvider jsonProvider = new JsonConstantProvider(constantsPath);
-                IConstantProvider constantProvider = new CachingConstantProvider(jsonProvider);
-                services.AddSingleton(constantProvider);
-                // Register any other app services
+                services.AddSingleton<IConstantProvider>(_ =>
+                {
+                    var jsonProvider = new JsonConstantProvider(constantsPath);
+                    return new CachingConstantProvider(jsonProvider);
+                });
+
+                services.AddSingleton<ICamera>(sp =>
+                {
+                    var game = sp.GetRequiredService<BreakerGame>();
+                    return new MonoGameCamera(game.GraphicsDevice,
+                        sp.GetRequiredService<IConstantProvider>());
+                });
+
+                services.AddSingleton<IChunkManager>(_ =>
+                    new VoxelChunkManager(Path.Combine("Content", "voxels")));
+
+                services.AddSingleton<IChunkRenderer>(sp =>
+                    new ChunkRendererManager(sp.GetRequiredService<BreakerGame>().GraphicsDevice,
+                        sp.GetRequiredService<ICamera>()));
             })
             .Build();
 

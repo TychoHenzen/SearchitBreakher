@@ -1,17 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Numerics;
+using SearchitLibrary.Abstractions;
 
 namespace SearchitLibrary.Graphics;
 
 /// <summary>
 /// Manages multiple voxel chunks, handles loading chunks, and provides access to voxels across chunk boundaries.
 /// </summary>
-public class VoxelChunkManager
+public class VoxelChunkManager : IChunkManager
 {
-    private readonly Dictionary<Vector3, VoxelChunk?> _chunks;
     private readonly string _chunkDirectory;
+    private readonly Dictionary<Vector3, VoxelChunk?> _chunks;
     private Vector3 _playerPosition;
 
     public VoxelChunkManager(string? chunkDirectory)
@@ -25,6 +23,11 @@ public class VoxelChunkManager
         {
             Directory.CreateDirectory(_chunkDirectory);
         }
+    }
+
+    public IEnumerable<VoxelChunk?> GetVisibleChunks()
+    {
+        return _chunks.Values;
     }
 
     /// <summary>
@@ -61,6 +64,38 @@ public class VoxelChunkManager
 
         return chunk;
     }
+
+    /// <summary>
+    ///     Loads chunks in a radius around the player position and unloads distant chunks.
+    /// </summary>
+    public void UpdateChunksAroundPlayer(Vector3 playerPosition, int loadRadius)
+    {
+        // Store player position
+        _playerPosition = playerPosition;
+
+        // Identify chunks that should be kept loaded
+        var chunksToKeep = IdentifyRelevantChunks(playerPosition, loadRadius);
+
+        // Load chunks that aren't already loaded
+        LoadNeededChunks(chunksToKeep);
+
+        // Unload chunks that are too far away
+        UnloadDistantChunks(chunksToKeep);
+    }
+
+
+    /// <summary>
+    ///     Gets all currently loaded chunks.
+    /// </summary>
+    public IEnumerable<VoxelChunk> GetLoadedChunks()
+    {
+        return _chunks.Values.Where(chunk => chunk != null)!;
+    }
+
+    /// <summary>
+    ///     Gets the number of currently loaded chunks.
+    /// </summary>
+    public int LoadedChunkCount => _chunks.Count;
 
     /// <summary>
     /// Unloads a chunk at the specified position.
@@ -168,33 +203,6 @@ public class VoxelChunkManager
     }
 
     /// <summary>
-    /// Loads chunks in a radius around the player position and unloads distant chunks.
-    /// </summary>
-    public void UpdateChunksAroundPlayer(Vector3 playerPosition, int loadRadius)
-    {
-        // Store player position
-        _playerPosition = playerPosition;
-
-        // Identify chunks that should be kept loaded
-        var chunksToKeep = IdentifyRelevantChunks(playerPosition, loadRadius);
-
-        // Load chunks that aren't already loaded
-        LoadNeededChunks(chunksToKeep);
-
-        // Unload chunks that are too far away
-        UnloadDistantChunks(chunksToKeep);
-    }
-
-
-    /// <summary>
-    /// Gets all currently loaded chunks.
-    /// </summary>
-    public IEnumerable<VoxelChunk> GetLoadedChunks()
-    {
-        return _chunks.Values.Where(chunk => chunk != null)!;
-    }
-
-    /// <summary>
     /// Gets the voxel at the specified world position, handling chunk boundaries.
     /// </summary>
     public byte GetVoxelAt(Vector3 worldPosition)
@@ -221,7 +229,7 @@ public class VoxelChunkManager
     public void SetVoxelAt(Vector3 worldPosition, byte value)
     {
         // Calculate the chunk position that contains this world position
-        
+
         Vector3 chunkPos = CalculateChunkPosition(worldPosition);
 
         // Try to get the chunk, or load it if it's not loaded
@@ -270,7 +278,7 @@ public class VoxelChunkManager
 
         return chunk;
     }
-    
+
     /// <summary>
     /// Checks if a chunk is loaded at the specified position.
     /// </summary>
@@ -278,9 +286,4 @@ public class VoxelChunkManager
     {
         return _chunks.ContainsKey(chunkPosition);
     }
-
-    /// <summary>
-    /// Gets the number of currently loaded chunks.
-    /// </summary>
-    public int LoadedChunkCount => _chunks.Count;
 }
