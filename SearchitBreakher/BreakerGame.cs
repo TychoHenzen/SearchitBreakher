@@ -1,8 +1,13 @@
-﻿using Microsoft.Xna.Framework;
+﻿// BreakerGame.cs (Updated to use ConstantProvider)
+
+using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SearchitBreakher.Graphics;
 using SearchitLibrary.Graphics;
+using SearchitLibrary.IO;
+using SearchitLibrary.Abstractions;
 using System.IO;
 
 namespace SearchitBreakher;
@@ -18,7 +23,6 @@ public class BreakerGame : Game
     private ChunkRendererManager _chunkRendererManager;
 
     private const int LoadRadius = 3;
-
     private MouseState _previousMouseState;
 
     public BreakerGame()
@@ -30,10 +34,15 @@ public class BreakerGame : Game
 
     protected override void Initialize()
     {
-        _camera = new MonoGameCamera(GraphicsDevice);
+        var constantsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "constants.json");
+        IConstantProvider jsonProvider = new JsonConstantProvider(constantsPath);
+        IConstantProvider constantProvider = new CachingConstantProvider(jsonProvider);
+
+        _camera = new MonoGameCamera(GraphicsDevice, constantProvider);
         _chunkRendererManager = new ChunkRendererManager(GraphicsDevice, _camera);
         CenterMouse();
         _previousMouseState = Mouse.GetState();
+
         base.Initialize();
     }
 
@@ -47,11 +56,7 @@ public class BreakerGame : Game
 
     private void TryLoadFont()
     {
-        try
-        {
-            _font = Content.Load<SpriteFont>("Font");
-        }
-        catch { }
+        try { _font = Content.Load<SpriteFont>("Font"); } catch { }
     }
 
     private void InitializeChunkManagement()
@@ -117,7 +122,6 @@ public class BreakerGame : Game
             _camera.GetViewMatrix() * _camera.GetProjectionMatrix());
 
         _chunkRendererManager.RenderVisibleChunks(_chunkManager, frustum);
-
         DrawUI();
 
         base.Draw(gameTime);
