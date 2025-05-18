@@ -1,44 +1,42 @@
 ﻿// BreakerGame.cs (Updated to use ConstantProvider)
 
-using System;
+using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SearchitBreakher.Graphics;
-using SearchitLibrary.Graphics;
-using SearchitLibrary.IO;
 using SearchitLibrary.Abstractions;
-using System.IO;
+using SearchitLibrary.Graphics;
+using Vector3 = System.Numerics.Vector3;
 
 namespace SearchitBreakher;
 
 public class BreakerGame : Game
 {
+    private const int LoadRadius = 3;
+    private readonly IConstantProvider _constantProvider;
     private readonly GraphicsDeviceManager _graphics;
-    private SpriteBatch _spriteBatch;
     private MonoGameCamera _camera;
-    private SpriteFont _font;
 
     private VoxelChunkManager _chunkManager;
     private ChunkRendererManager _chunkRendererManager;
-
-    private const int LoadRadius = 3;
+    private SpriteFont _font;
     private MouseState _previousMouseState;
 
-    public BreakerGame()
+    private SpriteBatch _spriteBatch;
+
+    public BreakerGame(IConstantProvider constantProvider)
     {
+        _constantProvider = constantProvider;
         _graphics = new GraphicsDeviceManager(this);
         Content.RootDirectory = "Content";
         IsMouseVisible = false;
     }
 
+
     protected override void Initialize()
     {
-        var constantsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "constants.json");
-        IConstantProvider jsonProvider = new JsonConstantProvider(constantsPath);
-        IConstantProvider constantProvider = new CachingConstantProvider(jsonProvider);
-
-        _camera = new MonoGameCamera(GraphicsDevice, constantProvider);
+        _camera = new MonoGameCamera(GraphicsDevice, _constantProvider);
         _chunkRendererManager = new ChunkRendererManager(GraphicsDevice, _camera);
         CenterMouse();
         _previousMouseState = Mouse.GetState();
@@ -56,7 +54,13 @@ public class BreakerGame : Game
 
     private void TryLoadFont()
     {
-        try { _font = Content.Load<SpriteFont>("Font"); } catch { }
+        try
+        {
+            _font = Content.Load<SpriteFont>("Font");
+        }
+        catch
+        {
+        }
     }
 
     private void InitializeChunkManagement()
@@ -73,7 +77,7 @@ public class BreakerGame : Game
 
     private void UpdateLoadedChunks()
     {
-        var playerPos = new System.Numerics.Vector3(
+        var playerPos = new Vector3(
             _camera.Position.X,
             _camera.Position.Y,
             _camera.Position.Z);
@@ -140,13 +144,23 @@ public class BreakerGame : Game
         GraphicsDevice.DepthStencilState = DepthStencilState.None;
         _spriteBatch.Begin();
 
-        _spriteBatch.DrawString(_font, $"Look Speed: {_camera.Constants.LookSpeed:F2} ([/] to adjust)", new Vector2(10, 10), Color.White);
-        _spriteBatch.DrawString(_font, $"Move Speed: {_camera.Constants.MoveSpeed:F2} (-/+ to adjust)", new Vector2(10, 30), Color.White);
+        _spriteBatch.DrawString(_font, $"Look Speed: {_camera.Constants.LookSpeed:F2} ([/] to adjust)",
+            new Vector2(10, 10), Color.White);
+        _spriteBatch.DrawString(_font, $"Move Speed: {_camera.Constants.MoveSpeed:F2} (-/+ to adjust)",
+            new Vector2(10, 30), Color.White);
         _spriteBatch.DrawString(_font, "WASD: Move, Mouse: Look, Space/C: Up/Down", new Vector2(10, 50), Color.White);
-        _spriteBatch.DrawString(_font, $"Camera Position: ({_camera.Position.X:F2}, {_camera.Position.Y:F2}, {_camera.Position.Z:F2})", new Vector2(10, 70), Color.Yellow);
-        _spriteBatch.DrawString(_font, $"Distance to Origin: {Vector3.Distance(_camera.Position, Vector3.Zero):F2} units", new Vector2(10, 90), Color.Yellow);
-        _spriteBatch.DrawString(_font, $"Loaded Chunks: {_chunkManager.LoadedChunkCount} | Rendered: {_chunkRendererManager.RendererCount}", new Vector2(10, 110), Color.LightGreen);
-        _spriteBatch.DrawString(_font, "Front: Red | Back: Green | Left: Blue | Right: Yellow | Top: Magenta | Bottom: Cyan", new Vector2(10, 130), Color.White);
+        _spriteBatch.DrawString(_font,
+            $"Camera Position: ({_camera.Position.X:F2}, {_camera.Position.Y:F2}, {_camera.Position.Z:F2})",
+            new Vector2(10, 70), Color.Yellow);
+        _spriteBatch.DrawString(_font,
+            $"Distance to Origin: {Microsoft.Xna.Framework.Vector3.Distance(_camera.Position, Microsoft.Xna.Framework.Vector3.Zero):F2} units",
+            new Vector2(10, 90), Color.Yellow);
+        _spriteBatch.DrawString(_font,
+            $"Loaded Chunks: {_chunkManager.LoadedChunkCount} | Rendered: {_chunkRendererManager.RendererCount}",
+            new Vector2(10, 110), Color.LightGreen);
+        _spriteBatch.DrawString(_font,
+            "Front: Red | Back: Green | Left: Blue | Right: Yellow | Top: Magenta | Bottom: Cyan", new Vector2(10, 130),
+            Color.White);
 
         _spriteBatch.End();
     }
