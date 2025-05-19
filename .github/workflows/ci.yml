@@ -49,11 +49,11 @@ jobs:
             -reporttypes:Html
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           files: TestResults/coverage/coverage.opencover.xml
 
       - name: Upload coverage report for Pages
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v3
         with:
           path: coverage-report
