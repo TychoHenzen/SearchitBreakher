@@ -53,14 +53,18 @@ jobs:
         
       - name: Build executable
         run: dotnet build SearchitBreakher/SearchitBreakher.csproj --no-restore --configuration Release
+        
       - name: Build tests
         run: dotnet build SearchitTest/SearchitTest.csproj --no-restore --configuration Release
 
-      - name: Run unit tests with coverage
-        run: dotnet test SearchitTest/SearchitTest.csproj --no-build --configuration Release \
-            /p:CollectCoverage=true \
-            /p:CoverletOutputFormat=opencover \
+      - name: Run tests with coverage
+        shell: pwsh
+        run: |
+          dotnet test SearchitTest/SearchitTest.csproj --no-build --configuration Release `
+            /p:CollectCoverage=true `
+            /p:CoverletOutputFormat=opencover `
             /p:CoverletOutput=TestResults/coverage/
+
 
 
       - name: Generate HTML coverage report
