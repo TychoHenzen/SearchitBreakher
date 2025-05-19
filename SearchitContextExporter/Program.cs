@@ -6,6 +6,8 @@ using Clipboard = System.Windows.Forms.Clipboard;
 
 internal class Program
 {
+    public const bool tests = true;
+
     [STAThread]
     private static void Main(string[] args)
     {
@@ -18,18 +20,30 @@ internal class Program
         var trackedFiles = GetTrackedFiles(root);
 
         // Filter to only include common text-based files
-        var extensions = new HashSet<string> { ".cs", ".csproj", ".txt", ".json", ".xml", ".md" };
-        var textFiles = trackedFiles
+        var extensions = new HashSet<string> { ".cs", ".csproj", ".txt", ".gox", ".json", ".xml", ".md" };
+        var files = trackedFiles
             .Where(f => extensions.Contains(Path.GetExtension(f)))
+            // Exclude IDE/editor settings
+            .Where(f => !f.Contains(".vscode", StringComparison.OrdinalIgnoreCase))
+            .Where(f => !f.Contains(".config/", StringComparison.OrdinalIgnoreCase))
+            // Exclude CLAUDE.md and empty/boilerplate docs
+            .Where(f => !f.Contains("CLAUDE.md", StringComparison.OrdinalIgnoreCase))
+            .Where(f => !f.Contains("README.md", StringComparison.OrdinalIgnoreCase))
+            .Where(f => !f.EndsWith(".csproj", StringComparison.OrdinalIgnoreCase))
+            .Where(f => !f.EndsWith(".sln", StringComparison.OrdinalIgnoreCase))
+            // (Optionally) skip tests if you don’t need them
+            .Where(f => !f.StartsWith("SearchitContextExporter/", StringComparison.OrdinalIgnoreCase))
             .ToList();
+        if (!tests)
+            files = files.Where(f => !f.StartsWith("SearchitTest/", StringComparison.OrdinalIgnoreCase)).ToList();
 
         // Generate tree from filtered text files
-        var treeLines = BuildTreeLines(textFiles);
+        var treeLines = BuildTreeLines(files, root);
         File.WriteAllText(filePath, string.Join(Environment.NewLine, treeLines));
         File.AppendAllText(filePath, "\n");
 
         // Append contents of each filtered text file
-        AppendFileContents(root, filePath, textFiles);
+        AppendFileContents(root, filePath, files);
 
         // Estimate and print LLM token count for the context file
         EstimateTokens(filePath);
@@ -56,9 +70,9 @@ internal class Program
             .ToList();
     }
 
-    private static List<string> BuildTreeLines(List<string> relativePaths)
+    private static List<string> BuildTreeLines(List<string> relativePaths, string root)
     {
-        var rootNode = new TreeNode(Path.GetFileName(Directory.GetCurrentDirectory()));
+        var rootNode = new TreeNode(root);
         foreach (var rel in relativePaths)
         {
             var parts = rel.Split(new[] { '/', Path.DirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
@@ -83,6 +97,7 @@ internal class Program
 
     private static void AppendFileContents(string root, string filePath, List<string> relativeFiles)
     {
+        var BinaryExtensions = new HashSet<string> { ".gox" };
         using var writer = File.AppendText(filePath);
         foreach (var rel in relativeFiles)
             try
@@ -90,7 +105,11 @@ internal class Program
                 var relPath = rel.Replace('/', Path.DirectorySeparatorChar);
                 var full = Path.Combine(root, relPath);
                 writer.WriteLine($"=== Begin {rel} ===");
-                writer.Write(File.ReadAllText(full));
+                if (!BinaryExtensions.Contains(Path.GetExtension(full)))
+                    writer.Write(File.ReadAllText(full));
+                else
+                    writer.WriteLine("[Contents of binary file omitted]");
+
                 writer.WriteLine($"=== End {rel} ===\n");
             }
             catch (Exception e)

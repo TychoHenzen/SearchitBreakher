@@ -1,0 +1,49 @@
+﻿name: Mutation Testing
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  stryker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', '**/packages.config') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Cache .NET tools
+        uses: actions/cache@v3
+        with:
+          path: ~/.dotnet/tools
+          key: dotnet-tools-${{ runner.os }}
+          restore-keys: |
+            dotnet-tools-${{ runner.os }}
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Install Stryker.NET
+        run: dotnet tool install --global dotnet-stryker
+
+      - name: Run mutation analysis
+        run: |
+          export PATH="$HOME/.dotnet/tools:$PATH"
+          dotnet stryker --reporters "html;markdown" --log-level "info"
+
+      - name: Upload mutation report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: mutation-report
+          path: StrykerOutput
