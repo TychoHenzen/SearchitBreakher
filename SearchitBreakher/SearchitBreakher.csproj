@@ -5,7 +5,8 @@
         <RollForward>Major</RollForward>
         <PublishReadyToRun>false</PublishReadyToRun>
         <TieredCompilation>false</TieredCompilation>
-        <MonoGameContentBuilderVerbose>true</MonoGameContentBuilderVerbose>
+        <MonoGameMGCBAdditionalArguments>/verbose</MonoGameMGCBAdditionalArguments>
+
     </PropertyGroup>
     <PropertyGroup>
         <ApplicationManifest>app.manifest</ApplicationManifest>
