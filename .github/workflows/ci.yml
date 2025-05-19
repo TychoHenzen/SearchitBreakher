@@ -20,6 +20,9 @@ jobs:
           restore-keys: |
             nuget-${{ runner.os }}-
 
+      - name: Install VC++ runtime needed by MGCB
+        run: choco install vcredist140 -y
+
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v3
         with:
