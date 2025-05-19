@@ -37,9 +37,11 @@ jobs:
         run: dotnet tool install --global dotnet-stryker
 
       - name: Run mutation analysis
+        shell: bash
+        env:
+          PATH: "$HOME/.dotnet/tools:$PATH"
         run: |
-          export PATH="$HOME/.dotnet/tools:$PATH"
-          dotnet stryker --reporters "html;markdown" --log-level "info"
+          dotnet stryker -reporters "html;markdown" -log-level "info"
 
       - name: Upload mutation report
         if: always()
