@@ -29,7 +29,7 @@ jobs:
           dotnet-version: 9.0.x
             
       - name: Install MonoGame Content Builder
-        run: dotnet tool install --global dotnet-mgcb --version 3.8.3
+        run: dotnet tool install dotnet-mgcb --version 3.8.3
         
       - name: Install ReportGenerator
         run: dotnet tool install --global dotnet-reportgenerator-globaltool
@@ -40,15 +40,16 @@ jobs:
       - name: Add global tools to PATH
         shell: bash
         run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+        
+      - name: Run MGCB manually (debug)
+        run: mgcb -@:"SearchitBreakher/Content/Content.mgcb"
+          /platform:DesktopGL
+          /outputDir:$(pwd)/tmp/out
+          /intermediateDir:$(pwd)/tmp/obj
 
       - name: Build library
         run: dotnet build SearchitLibrary/SearchitLibrary.csproj --no-restore --configuration Release
 
-      - name: Run MGCB manually (debug)
-        run: mgcb -@:"SearchitBreakher/Content/Content.mgcb"
-                     /platform:DesktopGL
-                     /outputDir:$(pwd)/tmp/out
-                     /intermediateDir:$(pwd)/tmp/obj
         
       - name: Build executable
         run: dotnet build SearchitBreakher/SearchitBreakher.csproj --no-restore --configuration Release /p:MonoGameContentBuilderVerbose=true
