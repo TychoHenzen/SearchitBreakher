@@ -41,7 +41,7 @@ jobs:
         env:
           PATH: "$HOME/.dotnet/tools:$PATH"
         run: |
-          dotnet stryker -reporters "html;markdown" -log-level "info"
+          dotnet stryker
 
       - name: Upload mutation report
         if: always()

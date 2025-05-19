@@ -31,15 +31,16 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: Build
-        run: |
-          dotnet build SearchitBreakher/SearchitBreakher.csproj --no-restore --configuration Release
-          dotnet build SearchitLibrary/SearchitLibrary.csproj --no-restore --configuration Release
-          dotnet build SearchitTest/SearchitTest.csproj --no-restore --configuration Release
+      - name: Build library
+        run: dotnet build SearchitLibrary/SearchitLibrary.csproj --no-restore --configuration Release
+        
+      - name: Build executable
+        run: dotnet build SearchitBreakher/SearchitBreakher.csproj --no-restore --configuration Release
+      - name: Build tests
+        run: dotnet build SearchitTest/SearchitTest.csproj --no-restore --configuration Release
 
       - name: Run unit tests with coverage
-        run: |
-          dotnet test --no-build --configuration Release \
+        run: dotnet test SearchitTest/SearchitTest.csproj --no-build --configuration Release \
             /p:CollectCoverage=true \
             /p:CoverletOutputFormat=opencover \
             /p:CoverletOutput=TestResults/coverage/

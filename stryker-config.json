@@ -1,9 +1,9 @@
 {
   "stryker-config": {
     "project-info": {
-      "name": "",
-      "module": "",
-      "version": ""
+      "name": "SearchitBreakher",
+      "module": "SearchitLibrary",
+      "version": "1.0"
     },
     "concurrency": 8,
     "mutation-level": "Standard",
@@ -12,10 +12,10 @@
     "mutate": [
       "**/*"
     ],
-    "solution": null,
+    "solution": "SearchitBreakher.sln",
     "configuration": null,
     "target-framework": null,
-    "project": "",
+    "project": "SearchitLibrary/SearchitLibrary.csproj",
     "coverage-analysis": "perTest",
     "disable-bail": false,
     "disable-mix-mutants": false,
@@ -42,7 +42,7 @@
       "fallback-version": "master"
     },
     "dashboard-url": "https://dashboard.stryker-mutator.io",
-    "test-projects": [],
+    "test-projects": ["SearchitTest/SearchitTest.csproj"],
     "test-case-filter": "",
     "ignore-mutations": [],
     "ignore-methods": [],
