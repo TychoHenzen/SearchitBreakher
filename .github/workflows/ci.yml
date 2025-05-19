@@ -49,7 +49,6 @@ jobs:
                      /platform:DesktopGL
                      /outputDir:$(pwd)/tmp/out
                      /intermediateDir:$(pwd)/tmp/obj
-                     /verbose
         
       - name: Build executable
         run: dotnet build SearchitBreakher/SearchitBreakher.csproj --no-restore --configuration Release /p:MonoGameContentBuilderVerbose=true
