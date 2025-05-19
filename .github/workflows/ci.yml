@@ -41,7 +41,7 @@ jobs:
         run: dotnet build SearchitLibrary/SearchitLibrary.csproj --no-restore --configuration Release
         
       - name: Build executable
-        run: dotnet build SearchitBreakher/SearchitBreakher.csproj --no-restore --configuration Release /p:MonoGameContentBuilderQuiet=false
+        run: dotnet build SearchitBreakher/SearchitBreakher.csproj --no-restore --configuration Release /p:MonoGameContentBuilderVerbose=true
       - name: Build tests
         run: dotnet build SearchitTest/SearchitTest.csproj --no-restore --configuration Release
 
