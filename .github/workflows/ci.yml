@@ -41,12 +41,11 @@ jobs:
         shell: bash
         run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
-
       - name: Build library
         run: dotnet build SearchitLibrary/SearchitLibrary.csproj --no-restore --configuration Release
 
       - name: Run MGCB manually (debug)
-        run: dotnet mgcb -@:"SearchitBreakher/Content/Content.mgcb"
+        run: mgcb -@:"SearchitBreakher/Content/Content.mgcb"
                      /platform:DesktopGL
                      /outputDir:$(pwd)/tmp/out
                      /intermediateDir:$(pwd)/tmp/obj
