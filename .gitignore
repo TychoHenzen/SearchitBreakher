@@ -7,7 +7,7 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
-/References
+Searchit_context.txt
 
 # User-specific files
 *.rsuser
