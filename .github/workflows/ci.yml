@@ -23,17 +23,19 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 7.0.x
+          dotnet-version: 9.0.x
 
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: Build
-        run: dotnet build --no-restore --configuration Release
+      - name: Build application projects
+        run: |
+          dotnet build src/SearchitBreakher/SearchitBreakher.csproj --no-restore --configuration Release
+          dotnet build src/SearchitBreakher/SearchitLibrary.csproj --no-restore --configuration Release
 
       - name: Run unit tests with coverage
         run: |
-          dotnet test --no-build --configuration Release \
+          dotnet test tests/SearchitTest/SearchitTest.csproj --no-build --configuration Release \
             /p:CollectCoverage=true \
             /p:CoverletOutputFormat=opencover \
             /p:CoverletOutput=TestResults/coverage/
