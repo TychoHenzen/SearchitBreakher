@@ -5,10 +5,12 @@
         <RollForward>Major</RollForward>
         <PublishReadyToRun>false</PublishReadyToRun>
         <TieredCompilation>false</TieredCompilation>
+        <MonoGameContentBuilderVerbose>true</MonoGameContentBuilderVerbose>
     </PropertyGroup>
     <PropertyGroup>
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <ApplicationIcon>Icon.ico</ApplicationIcon>
+
     </PropertyGroup>
     <ItemGroup>
         <None Remove="Icon.ico"/>
