@@ -42,7 +42,7 @@ jobs:
         run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
         
       - name: Run MGCB manually (debug)
-        run: mgcb -@:"SearchitBreakher/Content/Content.mgcb"
+        run: dotnet mgcb -@:"SearchitBreakher/Content/Content.mgcb"
           /platform:DesktopGL
           /outputDir:$(pwd)/tmp/out
           /intermediateDir:$(pwd)/tmp/obj
