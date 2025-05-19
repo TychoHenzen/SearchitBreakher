@@ -27,12 +27,15 @@ jobs:
             
       - name: Install MonoGame Content Builder
         run: dotnet tool install --global dotnet-mgcb --version 3.8.3
-
+        
       - name: Install ReportGenerator
         run: dotnet tool install --global dotnet-reportgenerator-globaltool
 
       - name: Restore dependencies
         run: dotnet restore
+
+      - name: Add global tools to PATH
+        run: echo "%USERPROFILE%\.dotnet\tools" >> $Env:GITHUB_PATH
 
       - name: Build library
         run: dotnet build SearchitLibrary/SearchitLibrary.csproj --no-restore --configuration Release

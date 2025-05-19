@@ -20,7 +20,8 @@ internal class Program
         var trackedFiles = GetTrackedFiles(root);
 
         // Filter to only include common text-based files
-        var extensions = new HashSet<string> { ".cs", ".csproj", ".txt", ".gox", ".json", ".xml", ".yml", ".md" };
+        var extensions = new HashSet<string>
+            { ".cs", ".csproj", ".txt", ".gox", ".json", ".xml", ".yml", ".mgcb", ".spritefont", ".md" };
         var files = trackedFiles
             .Where(f => extensions.Contains(Path.GetExtension(f)))
             // Exclude IDE/editor settings
