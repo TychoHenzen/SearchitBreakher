@@ -28,6 +28,9 @@ jobs:
       - name: Install MonoGame Content Builder
         run: dotnet tool install --global dotnet-mgcb --version 3.8.3
 
+      - name: Install ReportGenerator
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool
+
       - name: Restore dependencies
         run: dotnet restore
 
@@ -35,7 +38,7 @@ jobs:
         run: dotnet build SearchitLibrary/SearchitLibrary.csproj --no-restore --configuration Release
         
       - name: Build executable
-        run: dotnet build SearchitBreakher/SearchitBreakher.csproj --no-restore --configuration Release
+        run: dotnet build SearchitBreakher/SearchitBreakher.csproj --no-restore --configuration Release /p:MonoGameContentBuilderQuiet=false
       - name: Build tests
         run: dotnet build SearchitTest/SearchitTest.csproj --no-restore --configuration Release
 
@@ -45,8 +48,6 @@ jobs:
             /p:CoverletOutputFormat=opencover \
             /p:CoverletOutput=TestResults/coverage/
 
-      - name: Install ReportGenerator
-        run: dotnet tool install --global dotnet-reportgenerator-globaltool
 
       - name: Generate HTML coverage report
         run: |
