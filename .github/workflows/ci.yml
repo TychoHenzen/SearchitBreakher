@@ -39,7 +39,8 @@ jobs:
 
       - name: Add global tools to PATH
         shell: bash
-        run: echo "%USERPROFILE%\.dotnet\tools" >> $Env:GITHUB_PATH
+        run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+
 
       - name: Build library
         run: dotnet build SearchitLibrary/SearchitLibrary.csproj --no-restore --configuration Release
