@@ -42,6 +42,13 @@ jobs:
 
       - name: Build library
         run: dotnet build SearchitLibrary/SearchitLibrary.csproj --no-restore --configuration Release
+
+      - name: Run MGCB manually (debug)
+        run: dotnet mgcb -@:"SearchitBreakher/Content/Content.mgcb"
+                     /platform:DesktopGL
+                     /outputDir:$(pwd)/tmp/out
+                     /intermediateDir:$(pwd)/tmp/obj
+                     /verbose
         
       - name: Build executable
         run: dotnet build SearchitBreakher/SearchitBreakher.csproj --no-restore --configuration Release /p:MonoGameContentBuilderVerbose=true
