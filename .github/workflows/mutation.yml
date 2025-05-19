@@ -2,9 +2,9 @@
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
 jobs:
   stryker:
@@ -39,10 +39,7 @@ jobs:
       - name: Run mutation analysis
         run: |
           export PATH="$HOME/.dotnet/tools:$PATH"
-          dotnet stryker \
-            --reporters "html;markdown" \
-            --log-level "info" \
-            --excluded-projects SearchitContextExporter
+          dotnet stryker --reporters "html;markdown" --log-level "info"
 
       - name: Upload mutation report
         if: always()
