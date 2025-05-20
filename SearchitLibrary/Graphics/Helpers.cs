@@ -43,14 +43,6 @@ public static class Helpers
         return new Vector3(x, y, z);
     }
 
-    public static void Foreach(Vector3 size, Action<Vector3> callback)
-    {
-        for (var x = 0; x < size.X; x++)
-        for (var y = 0; y < size.Y; y++)
-        for (var z = 0; z < size.Z; z++)
-            callback(new Vector3(x, y, z));
-    }
-
     public static void Foreach3(int size, Action<Vector3> callback)
     {
         for (var x = 0; x < size; x++)
@@ -59,11 +51,16 @@ public static class Helpers
             callback(new Vector3(x, y, z));
     }
 
-    public static void Foreach2(int size, Action<Vector2> callback)
+    /// <summary>
+    ///     Calculate the chunk position from a world position
+    /// </summary>
+    public static Vector3 CalculateChunkPosition(Vector3 worldPosition)
     {
-        for (var x = 0; x < size; x++)
-        for (var y = 0; y < size; y++)
-            callback(new Vector2(x, y));
+        return new Vector3(
+            MathF.Floor(worldPosition.X / Constants.ChunkSize) * Constants.ChunkSize,
+            MathF.Floor(worldPosition.Y / Constants.ChunkSize) * Constants.ChunkSize,
+            MathF.Floor(worldPosition.Z / Constants.ChunkSize) * Constants.ChunkSize
+        );
     }
 
     public static byte MapColorToVoxelType(this int color)

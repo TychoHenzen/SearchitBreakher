@@ -10,17 +10,15 @@ public class VoxelTests
     {
         // Arrange
         Vector3 position = new Vector3(1.0f, 2.0f, 3.0f);
-        Vector3 color = new Vector3(0.5f, 0.6f, 0.7f);
         float size = 1.0f;
 
         // Act
-        var voxel = new Voxel(position, color, size);
+        var voxel = new Voxel(position, size);
 
         Assert.Multiple(() =>
         {
             // Assert
             Assert.That(voxel.Position, Is.EqualTo(position));
-            Assert.That(voxel.FrontColor, Is.EqualTo(color));
             Assert.That(voxel.Size, Is.EqualTo(size));
         });
     }
@@ -36,7 +34,6 @@ public class VoxelTests
         Assert.Multiple(() =>
         {
             Assert.That(voxel.Position, Is.EqualTo(new Vector3(0.0f, 0.0f, 0.0f)));
-            Assert.That(voxel.FrontColor, Is.EqualTo(new Vector3(1.0f, 0.0f, 0.0f))); // Red
             Assert.That(voxel.Size, Is.EqualTo(1.0f));
         });
     }
@@ -45,7 +42,7 @@ public class VoxelTests
     public void GetVertices_ShouldReturnEightVerticesForCube()
     {
         // Arrange
-        var voxel = new Voxel(new Vector3(0, 0, 0), new Vector3(1, 0, 0), 1.0f);
+        var voxel = new Voxel(new Vector3(0, 0, 0), 1.0f);
 
         // Act
         var vertices = voxel.GetVertices();
@@ -73,7 +70,7 @@ public class VoxelTests
     {
         // Arrange
         var position = new Vector3(1.0f, 2.0f, 3.0f);
-        var voxel = new Voxel(position, new Vector3(1, 0, 0), 1.0f);
+        var voxel = new Voxel(position, 1.0f);
 
         // Act
         var vertices = voxel.GetVertices();
@@ -99,10 +96,8 @@ public class VoxelTests
     public void GetIndices_ShouldReturn36Indices()
     {
         // Arrange
-        var voxel = new Voxel(new Vector3(0, 0, 0), new Vector3(1, 0, 0), 1.0f);
-
         // Act
-        var indices = voxel.GetIndices();
+        var indices = Voxel.GetIndices();
 
         // Assert
         Assert.That(indices, Is.Not.Null);

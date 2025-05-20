@@ -23,45 +23,6 @@ public class VoxelChunkManager : IChunkManager
         }
     }
 
-    public IEnumerable<VoxelChunk?> GetVisibleChunks()
-    {
-        return _chunks.Values;
-    }
-
-    /// <summary>
-    /// Loads a chunk at the specified position. If the chunk doesn't exist, 
-    /// returns null - it does NOT create a new chunk with test pattern.
-    /// </summary>
-    public VoxelChunk? LoadChunk(Vector3 chunkPosition)
-    {
-        // Check if the chunk is already loaded
-        if (_chunks.TryGetValue(chunkPosition, out VoxelChunk? existingChunk))
-        {
-            return existingChunk;
-        }
-
-        VoxelChunk? chunk = null;
-
-        // Determine the chunk file path
-        string chunkFileName = $"Chunk_{chunkPosition.X}_{chunkPosition.Y}_{chunkPosition.Z}.gox";
-        string chunkFilePath = Path.Combine(_chunkDirectory, chunkFileName);
-
-        // Try to load the chunk from file if it exists
-        if (!File.Exists(chunkFilePath)) return chunk;
-
-        try
-        {
-            chunk = ChunkLoader.LoadGoxFile(chunkFilePath, chunkPosition);
-            _chunks[chunkPosition] = chunk;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error loading chunk: {ex.Message}");
-        }
-
-        return chunk;
-    }
-
     /// <summary>
     ///     Loads chunks in a radius around the player position and unloads distant chunks.
     /// </summary>
@@ -92,6 +53,37 @@ public class VoxelChunkManager : IChunkManager
     public int LoadedChunkCount => _chunks.Count;
 
     /// <summary>
+    ///     Loads a chunk at the specified position. If the chunk doesn't exist,
+    ///     returns null - it does NOT create a new chunk with test pattern.
+    /// </summary>
+    public VoxelChunk? LoadChunk(Vector3 chunkPosition)
+    {
+        // Check if the chunk is already loaded
+        if (_chunks.TryGetValue(chunkPosition, out var existingChunk)) return existingChunk;
+
+        VoxelChunk? chunk = null;
+
+        // Determine the chunk file path
+        var chunkFileName = $"Chunk_{chunkPosition.X}_{chunkPosition.Y}_{chunkPosition.Z}.gox";
+        var chunkFilePath = Path.Combine(_chunkDirectory, chunkFileName);
+
+        // Try to load the chunk from file if it exists
+        if (!File.Exists(chunkFilePath)) return chunk;
+
+        try
+        {
+            chunk = ChunkLoader.LoadGoxFile(chunkFilePath, chunkPosition);
+            _chunks[chunkPosition] = chunk;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading chunk: {ex.Message}");
+        }
+
+        return chunk;
+    }
+
+    /// <summary>
     /// Unloads a chunk at the specified position.
     /// </summary>
     public void LoadChunk(Vector3 chunkPosition, VoxelChunk chunk)
@@ -107,29 +99,6 @@ public class VoxelChunkManager : IChunkManager
         _chunks.Remove(chunkPosition);
     }
 
-    /// <summary>
-    /// Calculate the chunk position from a world position
-    /// </summary>
-    private Vector3 CalculateChunkPosition(Vector3 worldPosition)
-    {
-        return new Vector3(
-            MathF.Floor(worldPosition.X / Constants.ChunkSize) * Constants.ChunkSize,
-            MathF.Floor(worldPosition.Y / Constants.ChunkSize) * Constants.ChunkSize,
-            MathF.Floor(worldPosition.Z / Constants.ChunkSize) * Constants.ChunkSize
-        );
-    }
-
-    /// <summary>
-    /// Converts a world position to chunk grid coordinates (integer indices)
-    /// </summary>
-    private static Vector3 GetChunkGridCoordinates(Vector3 worldPosition)
-    {
-        return new Vector3(
-            (int)MathF.Floor(worldPosition.X / Constants.ChunkSize),
-            (int)MathF.Floor(worldPosition.Y / Constants.ChunkSize),
-            (int)MathF.Floor(worldPosition.Z / Constants.ChunkSize)
-        );
-    }
 
     /// <summary>
     /// Identifies chunks (by their world‐space origin) that should be kept loaded
@@ -141,7 +110,7 @@ public class VoxelChunkManager : IChunkManager
 
         int chunkRadius = Math.Max(1, loadRadius);
         var span = chunkRadius * 2 + 1;
-        var playerChunkOrigin = CalculateChunkPosition(playerPosition);
+        var playerChunkOrigin = Helpers.CalculateChunkPosition(playerPosition);
 
         // offset will run from (0,0,0) to (span-1, span-1, span-1)
         Helpers.Foreach3(span, offset =>
@@ -197,7 +166,7 @@ public class VoxelChunkManager : IChunkManager
     public byte GetVoxelAt(Vector3 worldPosition)
     {
         // Calculate the chunk position that contains this world position
-        Vector3 chunkPos = CalculateChunkPosition(worldPosition);
+        var chunkPos = Helpers.CalculateChunkPosition(worldPosition);
 
         // Check if the chunk is loaded
         if (!_chunks.TryGetValue(chunkPos, out VoxelChunk? chunk) || chunk == null)
@@ -219,10 +188,10 @@ public class VoxelChunkManager : IChunkManager
     {
         // Calculate the chunk position that contains this world position
 
-        Vector3 chunkPos = CalculateChunkPosition(worldPosition);
+        var chunkPos = Helpers.CalculateChunkPosition(worldPosition);
 
         // Try to get the chunk, or load it if it's not loaded
-        if (!_chunks.TryGetValue(chunkPos, out VoxelChunk? chunk))
+        if (!_chunks.TryGetValue(chunkPos, out var chunk))
         {
             chunk = LoadChunk(chunkPos);
         }
@@ -246,10 +215,10 @@ public class VoxelChunkManager : IChunkManager
     public VoxelChunk? GetChunkAt(Vector3 worldPosition)
     {
         // Calculate the chunk position
-        var chunkPos = CalculateChunkPosition(worldPosition);
+        var chunkPos = Helpers.CalculateChunkPosition(worldPosition);
 
         // Try to get the chunk, or load it if it's not loaded
-        if (!_chunks.TryGetValue(chunkPos, out VoxelChunk? chunk))
+        if (!_chunks.TryGetValue(chunkPos, out var chunk))
         {
             chunk = LoadChunk(chunkPos);
         }
