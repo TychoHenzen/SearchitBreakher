@@ -66,7 +66,7 @@ jobs:
             -reporttypes:Html
 
       - name: Upload coverage report for Pages
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: coverage-report
   stryker:
