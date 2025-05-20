@@ -23,18 +23,25 @@ namespace SearchitLibrary.Graphics
 
             // Extract all six frustum planes (left, right, bottom, top, near, far)
             var planes = ExtractFrustumPlanes(viewProjectionMatrix);
-            foreach (var plane in planes)
+
+            Console.WriteLine($"FrustumCulling: Testing chunk at {chunkPosition} with size {chunkSize}");
+            for (var i = 0; i < planes.Length; i++)
             {
-                if (IsBoxOutsidePlane(min, max, plane))
-                    return false;
+                var plane = planes[i];
+                if (!IsBoxOutsidePlane(min, max, plane)) continue;
+
+                Console.WriteLine($"Result: Chunk is outside plane {i}, culling.");
+                return false;
             }
+
+            Console.WriteLine("Result: Chunk intersects frustum, visible.");
 
             return true;
         }
 
         private static Plane[] ExtractFrustumPlanes(Matrix4x4 m)
         {
-            Plane[] planes = new Plane[6];
+            var planes = new Plane[6];
 
             // Left plane (row4 + row1)
             planes[0] = new Plane(
@@ -86,7 +93,11 @@ namespace SearchitLibrary.Graphics
                 var n = p.Normal;
                 var length = MathF.Sqrt(n.X * n.X + n.Y * n.Y + n.Z * n.Z);
                 if (length < eps) continue;
-                planes[i] = new Plane(n / length, p.D / length);
+                if (i == 0)
+
+                    planes[i] = new Plane(n / length, p.D / length);
+                else
+                    planes[i] = new Plane(n / length, p.D / length);
             }
 
             return planes;
@@ -94,14 +105,31 @@ namespace SearchitLibrary.Graphics
 
         private static bool IsBoxOutsidePlane(Vector3 min, Vector3 max, Plane plane)
         {
-            // Pick the corner of the AABB that is most likely to be outside
-            Vector3 p = new Vector3(
-                plane.Normal.X >= 0 ? max.X : min.X,
-                plane.Normal.Y >= 0 ? max.Y : min.Y,
-                plane.Normal.Z >= 0 ? max.Z : min.Z
-            );
+            Console.WriteLine(
+                $"Plane: Normal=({plane.Normal.X:F3}, {plane.Normal.Y:F3}, {plane.Normal.Z:F3}), D={plane.D:F3}");
+            // Check all 8 corners of the AABB
+            Vector3[] corners =
+            {
+                new(min.X, min.Y, min.Z),
+                new(max.X, min.Y, min.Z),
+                new(min.X, max.Y, min.Z),
+                new(max.X, max.Y, min.Z),
+                new(min.X, min.Y, max.Z),
+                new(max.X, min.Y, max.Z),
+                new(min.X, max.Y, max.Z),
+                new(max.X, max.Y, max.Z)
+            };
 
-            return Vector3.Dot(plane.Normal, p) + plane.D < 0;
+            // The box is outside the plane if ALL corners are on the negative side
+            foreach (var corner in corners)
+            {
+                var distance = Vector3.Dot(plane.Normal, corner) + plane.D;
+
+                Console.WriteLine($"  Corner {corner}: distance to plane = {distance:F3}");
+                if (distance >= 0) return false;
+            }
+
+            return true;
         }
     }
 }

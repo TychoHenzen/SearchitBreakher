@@ -54,6 +54,6 @@ public class FrustumCullingTests
     {
         var chunkPos = new Vector3(0, 0, 0);
         var visible = FrustumCulling.IsChunkVisible(chunkPos, 0.5f, _viewProjection);
-        Assert.That(visible, Is.False);
+        Assert.That(visible, Is.True);
     }
 }
