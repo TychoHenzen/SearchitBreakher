@@ -129,7 +129,7 @@ jobs:
         run: |
           mkdir site
           mv coverage-report site/coverage
-          mv mutation-report site/mutation
+          mv StrykerOutput site/mutation
       - name: Upload combined site for Pages
         uses: actions/upload-pages-artifact@v3
         with:
