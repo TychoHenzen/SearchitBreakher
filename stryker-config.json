@@ -28,7 +28,8 @@
     "reporters": [
       "progress",
       "html",
-      "markdown"
+      "markdown",
+      "cleartexttree"
     ],
     "since": {
       "enabled": false,
