@@ -108,7 +108,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mutation-report
-          path: StrykerOutput
+          path: mutation-report
 
 
   publish-pages:
@@ -124,7 +124,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: mutation-report
-          path: StrykerOutput
+          path: mutation-report
       - name: Prepare site directory
         run: |
           mkdir site
