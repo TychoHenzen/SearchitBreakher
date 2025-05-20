@@ -8,6 +8,10 @@
     </PropertyGroup>
     <ItemGroup>
         <!-- Fallback clipboard support for non-Windows platforms -->
+        <PackageReference Include="coverlet.collector" Version="6.0.4">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="10.0.0-preview.4.25258.110"/>
         <PackageReference Include="TextCopy" Version="*"/>
         <PackageReference Include="TiktokenSharp" Version="1.1.7"/>
