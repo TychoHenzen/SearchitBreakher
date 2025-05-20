@@ -65,11 +65,12 @@ jobs:
             -targetdir:coverage-report `
             -reporttypes:Html
 
-      - name: Upload coverage report for Pages
+      - name: Upload coverage report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: coverage
+          path: coverage-report
   stryker:
     runs-on: windows-latest
     steps:
@@ -118,7 +119,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: coverage-report
-          path: coverage
+          path: coverage-report
       - name: Download mutation report
         uses: actions/download-artifact@v4
         with:
