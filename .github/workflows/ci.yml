@@ -101,7 +101,9 @@ jobs:
         run: dotnet tool install --global dotnet-stryker
 
       - name: Run mutation analysis
-        run: dotnet stryker > StrykerOutput/cleartexttree.log
+        run: |
+          New-Item -ItemType Directory -Path StrykerOutput -Force | Out-Null
+          dotnet stryker > StrykerOutput/cleartexttree.log
         
       - name: Upload mutation report
         if: always()
