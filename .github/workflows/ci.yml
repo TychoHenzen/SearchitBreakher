@@ -81,3 +81,53 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: coverage-report
+  stryker:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', '**/packages.config') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Cache .NET tools
+        uses: actions/cache@v3
+        with:
+          path: ~/.dotnet/tools
+          key: dotnet-tools-${{ runner.os }}
+          restore-keys: |
+            dotnet-tools-${{ runner.os }}
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Install Stryker.NET
+        run: dotnet tool install --global dotnet-stryker
+
+      - name: Run mutation analysis
+        run: dotnet stryker
+
+      - name: Upload mutation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutation-report
+          path: StrykerOutput
+          
+  deploy-pages:
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write      # Required to deploy to GitHub Pages
+      id-token: write   # Required for authentication
+    environment:
+      name: github-pages
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
