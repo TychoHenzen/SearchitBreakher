@@ -10,13 +10,11 @@ public class VoxelChunkManager : IChunkManager
 {
     private readonly string _chunkDirectory;
     private readonly Dictionary<Vector3, VoxelChunk?> _chunks;
-    private Vector3 _playerPosition;
 
     public VoxelChunkManager(string? chunkDirectory)
     {
         _chunks = new Dictionary<Vector3, VoxelChunk?>();
         _chunkDirectory = chunkDirectory ?? Path.Combine(Directory.GetCurrentDirectory(), "Chunks");
-        _playerPosition = Vector3.Zero;
 
         // Create the directory if it doesn't exist
         if (!string.IsNullOrEmpty(_chunkDirectory) && !Directory.Exists(_chunkDirectory))
@@ -49,17 +47,16 @@ public class VoxelChunkManager : IChunkManager
         string chunkFilePath = Path.Combine(_chunkDirectory, chunkFileName);
 
         // Try to load the chunk from file if it exists
-        if (File.Exists(chunkFilePath))
+        if (!File.Exists(chunkFilePath)) return chunk;
+
+        try
         {
-            try
-            {
-                chunk = ChunkLoader.LoadGoxFile(chunkFilePath, chunkPosition);
-                _chunks[chunkPosition] = chunk;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error loading chunk: {ex.Message}");
-            }
+            chunk = ChunkLoader.LoadGoxFile(chunkFilePath, chunkPosition);
+            _chunks[chunkPosition] = chunk;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading chunk: {ex.Message}");
         }
 
         return chunk;
@@ -70,9 +67,6 @@ public class VoxelChunkManager : IChunkManager
     /// </summary>
     public void UpdateChunksAroundPlayer(Vector3 playerPosition, int loadRadius)
     {
-        // Store player position
-        _playerPosition = playerPosition;
-
         // Identify chunks that should be kept loaded
         var chunksToKeep = IdentifyRelevantChunks(playerPosition, loadRadius);
 
@@ -128,9 +122,9 @@ public class VoxelChunkManager : IChunkManager
     /// <summary>
     /// Converts a world position to chunk grid coordinates (integer indices)
     /// </summary>
-    private Vector3Int GetChunkGridCoordinates(Vector3 worldPosition)
+    private static Vector3 GetChunkGridCoordinates(Vector3 worldPosition)
     {
-        return new Vector3Int(
+        return new Vector3(
             (int)MathF.Floor(worldPosition.X / Constants.ChunkSize),
             (int)MathF.Floor(worldPosition.Y / Constants.ChunkSize),
             (int)MathF.Floor(worldPosition.Z / Constants.ChunkSize)
@@ -138,38 +132,33 @@ public class VoxelChunkManager : IChunkManager
     }
 
     /// <summary>
-    /// Identifies chunks that should be kept loaded based on player position and radius
+    /// Identifies chunks (by their world‐space origin) that should be kept loaded
+    /// based on the player’s position and load radius.
     /// </summary>
     private HashSet<Vector3> IdentifyRelevantChunks(Vector3 playerPosition, int loadRadius)
     {
         var chunksToKeep = new HashSet<Vector3>();
 
-        // Ensure minimum radius of 1 (same as original)
         int chunkRadius = Math.Max(1, loadRadius);
+        var span = chunkRadius * 2 + 1;
+        var playerChunkOrigin = CalculateChunkPosition(playerPosition);
 
-        // Get player chunk grid coordinates
-        var playerChunk = GetChunkGridCoordinates(playerPosition);
-
-        // Add all chunks within the radius to the set of chunks to keep
-        for (int x = playerChunk.X - chunkRadius; x <= playerChunk.X + chunkRadius; x++)
+        // offset will run from (0,0,0) to (span-1, span-1, span-1)
+        Helpers.Foreach3(span, offset =>
         {
-            for (int y = playerChunk.Y - chunkRadius; y <= playerChunk.Y + chunkRadius; y++)
-            {
-                for (int z = playerChunk.Z - chunkRadius; z <= playerChunk.Z + chunkRadius; z++)
-                {
-                    var chunkPos = new Vector3(
-                        x * Constants.ChunkSize,
-                        y * Constants.ChunkSize,
-                        z * Constants.ChunkSize
-                    );
+            // recenter around zero and scale by ChunkSize
+            var worldOffset = new Vector3(
+                (offset.X - chunkRadius) * Constants.ChunkSize,
+                (offset.Y - chunkRadius) * Constants.ChunkSize,
+                (offset.Z - chunkRadius) * Constants.ChunkSize
+            );
 
-                    chunksToKeep.Add(chunkPos);
-                }
-            }
-        }
+            chunksToKeep.Add(playerChunkOrigin + worldOffset);
+        });
 
         return chunksToKeep;
     }
+
 
     /// <summary>
     /// Loads chunks that should be kept but aren't already loaded

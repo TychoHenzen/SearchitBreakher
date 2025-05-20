@@ -20,7 +20,7 @@ public class VoxelColorMapTests
     {
         byte type = 3;
         var all = VoxelColorMap.GetFaceColors(type);
-        foreach (VoxelFaceCalculator.FaceDirection dir in Enum.GetValues(typeof(VoxelFaceCalculator.FaceDirection)))
+        foreach (VoxelVisibility.FaceDirection dir in Enum.GetValues(typeof(VoxelVisibility.FaceDirection)))
         {
             var faceColor = VoxelColorMap.GetFaceColor(type, dir);
             Assert.That(faceColor, Is.EqualTo(all[(int)dir]));

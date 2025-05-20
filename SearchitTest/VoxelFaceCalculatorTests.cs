@@ -4,7 +4,7 @@ using SearchitLibrary.Graphics;
 namespace SearchitTest;
 
 [TestFixture]
-public class VoxelFaceCalculatorTests
+public class VoxelVisibilityTests
 {
     [SetUp]
     public void Setup()
@@ -21,7 +21,7 @@ public class VoxelFaceCalculatorTests
     [Test]
     public void CalculateVisibleFaces_EmptyChunk_ReturnsZero()
     {
-        var faces = VoxelFaceCalculator.CalculateVisibleFaces(_emptyChunk);
+        var faces = VoxelVisibility.CalculateVisibleFaces(_emptyChunk);
         Assert.That(faces, Is.Zero);
     }
 
@@ -29,7 +29,7 @@ public class VoxelFaceCalculatorTests
     public void CalculateVisibleFaces_SingleVoxelAtCorner_ReturnsSix()
     {
         // A lone voxel should have all 6 faces visible
-        var faces = VoxelFaceCalculator.CalculateVisibleFaces(_singleVoxelChunk);
+        var faces = VoxelVisibility.CalculateVisibleFaces(_singleVoxelChunk);
         Assert.That(faces, Is.EqualTo(6));
     }
 
@@ -38,22 +38,23 @@ public class VoxelFaceCalculatorTests
     {
         // For the single voxel at (0,0,0), adjacent negative indices are out-of-bounds
         Assert.That(
-            VoxelFaceCalculator.IsFaceVisible(_singleVoxelChunk, 0, 0, 0, VoxelFaceCalculator.FaceDirection.Front),
+            VoxelVisibility.IsFaceVisible(_singleVoxelChunk, Vector3.Zero, VoxelVisibility.FaceDirection.Front),
             Is.True);
         Assert.That(
-            VoxelFaceCalculator.IsFaceVisible(_singleVoxelChunk, 0, 0, 0, VoxelFaceCalculator.FaceDirection.Back),
+            VoxelVisibility.IsFaceVisible(_singleVoxelChunk, Vector3.Zero, VoxelVisibility.FaceDirection.Back),
             Is.True);
         Assert.That(
-            VoxelFaceCalculator.IsFaceVisible(_singleVoxelChunk, 0, 0, 0, VoxelFaceCalculator.FaceDirection.Left),
+            VoxelVisibility.IsFaceVisible(_singleVoxelChunk, Vector3.Zero, VoxelVisibility.FaceDirection.Left),
             Is.True);
         Assert.That(
-            VoxelFaceCalculator.IsFaceVisible(_singleVoxelChunk, 0, 0, 0, VoxelFaceCalculator.FaceDirection.Right),
+            VoxelVisibility.IsFaceVisible(_singleVoxelChunk, Vector3.Zero, VoxelVisibility.FaceDirection.Right),
             Is.True);
         Assert.That(
-            VoxelFaceCalculator.IsFaceVisible(_singleVoxelChunk, 0, 0, 0, VoxelFaceCalculator.FaceDirection.Top),
+            VoxelVisibility.IsFaceVisible(_singleVoxelChunk, Vector3.Zero, VoxelVisibility.FaceDirection.Top),
             Is.True);
         Assert.That(
-            VoxelFaceCalculator.IsFaceVisible(_singleVoxelChunk, 0, 0, 0, VoxelFaceCalculator.FaceDirection.Bottom),
+            VoxelVisibility.IsFaceVisible(_singleVoxelChunk, Vector3.Zero,
+                VoxelVisibility.FaceDirection.Bottom),
             Is.True);
     }
 }

@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using SearchitLibrary;
 using SearchitLibrary.Abstractions;
 using SearchitLibrary.Graphics;
-using Vector3 = Microsoft.Xna.Framework.Vector3;
+using Vector3 = System.Numerics.Vector3;
 
 namespace SearchitBreakher.Graphics
 {
@@ -15,14 +15,14 @@ namespace SearchitBreakher.Graphics
     public class ChunkRendererManager : IChunkRenderer
     {
         private readonly ICamera _camera;
-        private readonly Dictionary<System.Numerics.Vector3, ChunkRenderer> _chunkRenderers;
+        private readonly Dictionary<Vector3, ChunkRenderer> _chunkRenderers;
         private readonly GraphicsDevice _graphicsDevice;
 
         public ChunkRendererManager(GraphicsDevice graphicsDevice, ICamera camera)
         {
             _graphicsDevice = graphicsDevice;
             _camera = camera;
-            _chunkRenderers = new Dictionary<System.Numerics.Vector3, ChunkRenderer>();
+            _chunkRenderers = new Dictionary<Vector3, ChunkRenderer>();
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace SearchitBreakher.Graphics
         public void RenderChunk(VoxelChunk chunk)
         {
             // Convert chunk position to a key for the dictionary
-            System.Numerics.Vector3 chunkPos = chunk.Position;
+            var chunkPos = chunk.Position;
 
             // Get or create a renderer for this chunk
             if (!_chunkRenderers.TryGetValue(chunkPos, out var renderer))
@@ -101,7 +101,7 @@ namespace SearchitBreakher.Graphics
         /// <summary>
         /// Removes a renderer for a specific chunk.
         /// </summary>
-        public void RemoveRenderer(System.Numerics.Vector3 chunkPosition)
+        public void RemoveRenderer(Vector3 chunkPosition)
         {
             _chunkRenderers.Remove(chunkPosition);
         }

@@ -61,7 +61,7 @@ namespace SearchitBreakher.Graphics
 
             // Convert to MonoGame vertices
             _vertices = new VertexPositionColor[meshData.Positions.Length];
-            for (int i = 0; i < meshData.Positions.Length; i++)
+            for (var i = 0; i < meshData.Positions.Length; i++)
             {
                 _vertices[i] = new VertexPositionColor(
                     new Vector3(

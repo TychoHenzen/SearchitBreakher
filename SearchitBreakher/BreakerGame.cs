@@ -62,6 +62,7 @@ public class BreakerGame : Game
         }
         catch
         {
+            // ignored
         }
     }
 
@@ -85,19 +86,15 @@ public class BreakerGame : Game
     {
         if (IsExitRequested()) Exit();
 
-        if (IsActive)
+        var currentMouseState = Mouse.GetState();
+        Vector2 delta = new(
+            currentMouseState.X - _previousMouseState.X,
+            currentMouseState.Y - _previousMouseState.Y);
+        if (IsActive && delta != Vector2.Zero)
         {
-            MouseState currentMouseState = Mouse.GetState();
-            Vector2 delta = new(
-                currentMouseState.X - _previousMouseState.X,
-                currentMouseState.Y - _previousMouseState.Y);
-
-            if (delta != Vector2.Zero)
-            {
-                _camera.ApplyMouseDelta(delta);
-                CenterMouse();
-                _previousMouseState = Mouse.GetState();
-            }
+            _camera.ApplyMouseDelta(delta);
+            CenterMouse();
+            _previousMouseState = Mouse.GetState();
         }
 
         _camera.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
