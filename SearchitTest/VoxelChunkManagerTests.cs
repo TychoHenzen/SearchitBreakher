@@ -96,7 +96,7 @@ public class VoxelChunkManagerTests
         manager.LoadChunk(chunkPos);
 
         // Act
-        manager.UnloadChunk(chunkPos);
+        manager.RemoveChunk(chunkPos);
 
         // Assert
         Assert.That(manager.LoadedChunkCount, Is.EqualTo(0));

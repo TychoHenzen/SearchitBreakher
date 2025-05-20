@@ -5,7 +5,7 @@ namespace SearchitLibrary.Graphics;
 public static class Helpers
 {
     // Color mapping based on the colors in the Test.txt file
-    private static readonly Dictionary<int, byte> _colorMap = new()
+    private static readonly Dictionary<int, byte> ColorMap = new()
     {
         { 0x33FF33, 1 }, // Green
         { 0xFFFF33, 2 }, // Yellow
@@ -30,25 +30,17 @@ public static class Helpers
         return z * Constants.ChunkSize * Constants.ChunkSize + y * Constants.ChunkSize + x;
     }
 
-    // Converts an index back to coordinates
-    public static Vector3 GetPosition(int index)
+    public static void Foreach3(int start, int end, Action<Vector3> callback)
     {
-        // Match the updated GetIndex formula by reversing it
-        var x = index % Constants.ChunkSize;
-        index /= Constants.ChunkSize;
-        var y = index % Constants.ChunkSize;
-        index /= Constants.ChunkSize;
-        var z = index;
-
-        return new Vector3(x, y, z);
+        for (var x = start; x < end; x++)
+        for (var y = start; y < end; y++)
+        for (var z = start; z < end; z++)
+            callback(new Vector3(x, y, z));
     }
 
-    public static void Foreach3(int size, Action<Vector3> callback)
+    public static void Foreach3(int end, Action<Vector3> callback)
     {
-        for (var x = 0; x < size; x++)
-        for (var y = 0; y < size; y++)
-        for (var z = 0; z < size; z++)
-            callback(new Vector3(x, y, z));
+        Foreach3(0, end, callback);
     }
 
     /// <summary>
@@ -66,13 +58,13 @@ public static class Helpers
     public static byte MapColorToVoxelType(this int color)
     {
         // Try to get the exact color match
-        if (_colorMap.TryGetValue(color, out var voxelType)) return voxelType;
+        if (ColorMap.TryGetValue(color, out var voxelType)) return voxelType;
 
         // If no exact match, find the closest color
         var closestColor = 0xFFFFFF;
         var minDistance = int.MaxValue;
 
-        foreach (var mapColor in _colorMap.Keys)
+        foreach (var mapColor in ColorMap.Keys)
         {
             var r1 = (color >> 16) & 0xFF;
             var g1 = (color >> 8) & 0xFF;
@@ -91,6 +83,6 @@ public static class Helpers
             closestColor = mapColor;
         }
 
-        return _colorMap[closestColor];
+        return ColorMap[closestColor];
     }
 }

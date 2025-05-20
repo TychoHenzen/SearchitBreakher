@@ -86,40 +86,38 @@ public class VoxelChunkManager : IChunkManager
     /// <summary>
     /// Unloads a chunk at the specified position.
     /// </summary>
-    public void LoadChunk(Vector3 chunkPosition, VoxelChunk chunk)
+    public void RemoveChunk(Vector3 chunkPosition)
+    {
+        _chunks.Remove(chunkPosition);
+    }
+
+    /// <summary>
+    ///     Unloads a chunk at the specified position.
+    /// </summary>
+    public void AddChunk(Vector3 chunkPosition, VoxelChunk chunk)
     {
         _chunks.Add(chunkPosition, chunk);
     }
 
     /// <summary>
-    /// Unloads a chunk at the specified position.
-    /// </summary>
-    public void UnloadChunk(Vector3 chunkPosition)
-    {
-        _chunks.Remove(chunkPosition);
-    }
-
-
-    /// <summary>
     /// Identifies chunks (by their world‐space origin) that should be kept loaded
     /// based on the player’s position and load radius.
     /// </summary>
-    private HashSet<Vector3> IdentifyRelevantChunks(Vector3 playerPosition, int loadRadius)
+    private static HashSet<Vector3> IdentifyRelevantChunks(Vector3 playerPosition, int loadRadius)
     {
         var chunksToKeep = new HashSet<Vector3>();
 
         int chunkRadius = Math.Max(1, loadRadius);
-        var span = chunkRadius * 2 + 1;
         var playerChunkOrigin = Helpers.CalculateChunkPosition(playerPosition);
 
         // offset will run from (0,0,0) to (span-1, span-1, span-1)
-        Helpers.Foreach3(span, offset =>
+        Helpers.Foreach3(-chunkRadius, chunkRadius, offset =>
         {
             // recenter around zero and scale by ChunkSize
             var worldOffset = new Vector3(
-                (offset.X - chunkRadius) * Constants.ChunkSize,
-                (offset.Y - chunkRadius) * Constants.ChunkSize,
-                (offset.Z - chunkRadius) * Constants.ChunkSize
+                offset.X * Constants.ChunkSize,
+                offset.Y * Constants.ChunkSize,
+                offset.Z * Constants.ChunkSize
             );
 
             chunksToKeep.Add(playerChunkOrigin + worldOffset);
@@ -156,7 +154,7 @@ public class VoxelChunkManager : IChunkManager
         // Unload the identified chunks
         foreach (var chunkPos in chunksToUnload)
         {
-            UnloadChunk(chunkPos);
+            RemoveChunk(chunkPos);
         }
     }
 
@@ -203,7 +201,7 @@ public class VoxelChunkManager : IChunkManager
         }
 
         // Calculate the position within the chunk
-        Vector3 localPos = worldPosition - chunkPos;
+        var localPos = worldPosition - chunkPos;
 
         // Set the voxel in the chunk
         chunk.SetVoxel(localPos, value);
