@@ -111,7 +111,7 @@ public class VoxelChunkManager : IChunkManager
         var playerChunkOrigin = Helpers.CalculateChunkPosition(playerPosition);
 
         // offset will run from (0,0,0) to (span-1, span-1, span-1)
-        Helpers.Foreach3(-chunkRadius, chunkRadius, offset =>
+        Helpers.Foreach3(-chunkRadius, chunkRadius + 1, offset =>
         {
             // recenter around zero and scale by ChunkSize
             var worldOffset = new Vector3(
