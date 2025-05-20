@@ -2,9 +2,9 @@
 
 on:
   push:
-    branches: ["master"]
+    branches: [ "master" ]
   pull_request:
-    branches: ["master"]
+    branches: [ "master" ]
 
 jobs:
   build-test-coverage:
@@ -27,10 +27,10 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 9.0.x
-            
+
       - name: Install MonoGame Content Builder
         run: dotnet tool install dotnet-mgcb --version 3.8.3
-        
+
       - name: Install ReportGenerator
         run: dotnet tool install --global dotnet-reportgenerator-globaltool
 
@@ -40,13 +40,13 @@ jobs:
       - name: Add global tools to PATH
         shell: bash
         run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
-        
+
       - name: Build library
         run: dotnet build SearchitLibrary/SearchitLibrary.csproj --no-restore --configuration Release
-        
+
       - name: Build executable
         run: dotnet build SearchitBreakher/SearchitBreakher.csproj --no-restore --configuration Release
-        
+
       - name: Build tests
         run: dotnet build SearchitTest/SearchitTest.csproj --no-restore --configuration Release
 
@@ -102,7 +102,7 @@ jobs:
 
       - name: Run mutation analysis
         run: dotnet stryker
-
+        
       - name: Upload mutation report
         if: always()
         uses: actions/upload-artifact@v4
@@ -112,7 +112,7 @@ jobs:
 
 
   publish-pages:
-    needs: [build-test-coverage, stryker]
+    needs: [ build-test-coverage, stryker ]
     runs-on: ubuntu-latest
     steps:
       - name: Download coverage report
@@ -124,12 +124,18 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: mutation-report
-          path: StrykerOutput
+          path: mutation-report
+
+      - name: Flatten mutation report
+        run: |
+          mkdir -p mutation-pages
+          mv mutation-report/*/reports/* mutation-pages/
+      
       - name: Prepare site directory
         run: |
           mkdir site
           mv coverage-report site/coverage
-          mv StrykerOutput site/mutation
+          mv mutation-pages site/mutation
       - name: Upload combined site for Pages
         uses: actions/upload-pages-artifact@v3
         with:
