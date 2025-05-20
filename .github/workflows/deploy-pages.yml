@@ -13,7 +13,18 @@ jobs:
       id-token: write   # Required for authentication
     environment:
       name: github-pages
+      
     steps:
+
+      - name: Download Pages artifact from CI
+        uses: actions/download-artifact@v2
+        with:
+          name: coverage-report
+
+      - name: Download Pages artifact from CI
+        uses: actions/download-artifact@v2
+        with:
+          name: mutation-report
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
