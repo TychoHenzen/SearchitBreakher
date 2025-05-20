@@ -17,12 +17,12 @@ jobs:
     steps:
 
       - name: Download Pages artifact from CI
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v1
         with:
           name: coverage-report
 
       - name: Download Pages artifact from CI
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v1
         with:
           name: mutation-report
       - name: Deploy to GitHub Pages
