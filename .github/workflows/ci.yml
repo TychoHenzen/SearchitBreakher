@@ -83,7 +83,6 @@ jobs:
           path: coverage-report
   stryker:
     runs-on: windows-latest
-    needs: build-test-coverage
     steps:
       - uses: actions/checkout@v3
 
@@ -121,16 +120,39 @@ jobs:
           name: mutation-report
           path: StrykerOutput
 
-  deploy-pages:
+
+  publish-pages:
+    needs: [build-test-coverage, stryker]
     runs-on: ubuntu-latest
-    needs: stryker
+    steps:
+      - name: Download coverage report
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage-report
+      - name: Download mutation report
+        uses: actions/download-artifact@v4
+        with:
+          name: mutation-report
+          path: mutation-report
+      - name: Prepare site directory
+        run: |
+          mkdir site
+          mv coverage-report site/coverage
+          mv mutation-report site/mutation
+      - name: Upload combined site for Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy-pages:
+    needs: publish-pages
+    runs-on: ubuntu-latest
     permissions:
       pages: write      # to deploy to GitHub Pages
       id-token: write   # to authenticate the deployment
     environment:
       name: github-pages
-
     steps:
       - name: Deploy to GitHub Pages
-        id: deployment
         uses: actions/deploy-pages@v4
