@@ -3,4 +3,4 @@
 ## Reports
 
 - [Coverage Report (Pages)](https://TychoHenzen.github.io/SearchitBreakher/coverage)
-- [Mutation Testing Report (artifact)](https://TychoHenzen.github.io/SearchitBreakher/mutation)
+- [Mutation Testing Report (artifact)](https://TychoHenzen.github.io/SearchitBreakher/mutation/mutation-report.html)

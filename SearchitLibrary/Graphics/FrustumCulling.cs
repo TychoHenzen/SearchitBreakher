@@ -1,124 +1,107 @@
-using System;
 using System.Numerics;
 
 namespace SearchitLibrary.Graphics
 {
     /// <summary>
     /// Provides frustum culling functionality for voxel chunks.
+    /// Handles both perspective and orthographic projections uniformly via plane extraction.
     /// </summary>
-    public class FrustumCulling
+    public static class FrustumCulling
     {
         /// <summary>
         /// Tests if a chunk intersects with the view frustum.
         /// </summary>
-        /// <param name="chunkPosition">The position of the chunk</param>
-        /// <param name="chunkSize">The size of the chunk</param>
+        /// <param name="chunkPosition">The center position of the chunk</param>
+        /// <param name="chunkSize">The size (edge length) of the chunk</param>
         /// <param name="viewProjectionMatrix">The combined view-projection matrix</param>
         /// <returns>True if the chunk is visible</returns>
         public static bool IsChunkVisible(Vector3 chunkPosition, float chunkSize, Matrix4x4 viewProjectionMatrix)
         {
-            // Create a bounding box for the chunk
-            Vector3 min = chunkPosition;
-            Vector3 max = chunkPosition + new Vector3(chunkSize, chunkSize, chunkSize);
-            
-            // Extract frustum planes from the view-projection matrix
-            Plane[] frustumPlanes = ExtractFrustumPlanes(viewProjectionMatrix);
-            
-            // Test each corner of the box against each plane
-            foreach (var plane in frustumPlanes)
+            var halfSize = chunkSize * 0.5f;
+            var min = chunkPosition - new Vector3(halfSize);
+            var max = chunkPosition + new Vector3(halfSize);
+
+            // Extract all six frustum planes (left, right, bottom, top, near, far)
+            var planes = ExtractFrustumPlanes(viewProjectionMatrix);
+            foreach (var plane in planes)
             {
-                // If all corners are outside any plane, the box is outside the frustum
                 if (IsBoxOutsidePlane(min, max, plane))
-                {
                     return false;
-                }
             }
-            
-            // The box intersects or is inside the frustum
+
             return true;
         }
-        
-        private static Plane[] ExtractFrustumPlanes(Matrix4x4 viewProjectionMatrix)
+
+        private static Plane[] ExtractFrustumPlanes(Matrix4x4 m)
         {
-            // Extract the six frustum planes from the view-projection matrix
             Plane[] planes = new Plane[6];
-            
-            // Left plane
+
+            // Left plane (row4 + row1)
             planes[0] = new Plane(
-                viewProjectionMatrix.M14 + viewProjectionMatrix.M11,
-                viewProjectionMatrix.M24 + viewProjectionMatrix.M21,
-                viewProjectionMatrix.M34 + viewProjectionMatrix.M31,
-                viewProjectionMatrix.M44 + viewProjectionMatrix.M41
+                m.M41 + m.M11,
+                m.M42 + m.M12,
+                m.M43 + m.M13,
+                m.M44 + m.M14
             );
-            
-            // Right plane
+            // Right plane (row4 - row1)
             planes[1] = new Plane(
-                viewProjectionMatrix.M14 - viewProjectionMatrix.M11,
-                viewProjectionMatrix.M24 - viewProjectionMatrix.M21,
-                viewProjectionMatrix.M34 - viewProjectionMatrix.M31,
-                viewProjectionMatrix.M44 - viewProjectionMatrix.M41
+                m.M41 - m.M11,
+                m.M42 - m.M12,
+                m.M43 - m.M13,
+                m.M44 - m.M14
             );
-            
-            // Bottom plane
+            // Bottom plane (row4 + row2)
             planes[2] = new Plane(
-                viewProjectionMatrix.M14 + viewProjectionMatrix.M12,
-                viewProjectionMatrix.M24 + viewProjectionMatrix.M22,
-                viewProjectionMatrix.M34 + viewProjectionMatrix.M32,
-                viewProjectionMatrix.M44 + viewProjectionMatrix.M42
+                m.M41 + m.M21,
+                m.M42 + m.M22,
+                m.M43 + m.M23,
+                m.M44 + m.M24
             );
-            
-            // Top plane
+            // Top plane (row4 - row2)
             planes[3] = new Plane(
-                viewProjectionMatrix.M14 - viewProjectionMatrix.M12,
-                viewProjectionMatrix.M24 - viewProjectionMatrix.M22,
-                viewProjectionMatrix.M34 - viewProjectionMatrix.M32,
-                viewProjectionMatrix.M44 - viewProjectionMatrix.M42
+                m.M41 - m.M21,
+                m.M42 - m.M22,
+                m.M43 - m.M23,
+                m.M44 - m.M24
             );
-            
-            // Near plane
+            // Near plane (row4 + row3)
             planes[4] = new Plane(
-                viewProjectionMatrix.M13,
-                viewProjectionMatrix.M23,
-                viewProjectionMatrix.M33,
-                viewProjectionMatrix.M43
+                m.M41 + m.M31,
+                m.M42 + m.M32,
+                m.M43 + m.M33,
+                m.M44 + m.M34
             );
-            
-            // Far plane
+            // Far plane (row4 - row3)
             planes[5] = new Plane(
-                viewProjectionMatrix.M14 - viewProjectionMatrix.M13,
-                viewProjectionMatrix.M24 - viewProjectionMatrix.M23,
-                viewProjectionMatrix.M34 - viewProjectionMatrix.M33,
-                viewProjectionMatrix.M44 - viewProjectionMatrix.M43
+                m.M41 - m.M31,
+                m.M42 - m.M32,
+                m.M43 - m.M33,
+                m.M44 - m.M34
             );
-            
-            // Normalize the planes
-            for (int i = 0; i < 6; i++)
+
+            const float eps = 1e-6f;
+            for (var i = 0; i < planes.Length; i++)
             {
-                float length = MathF.Sqrt(
-                    planes[i].Normal.X * planes[i].Normal.X +
-                    planes[i].Normal.Y * planes[i].Normal.Y +
-                    planes[i].Normal.Z * planes[i].Normal.Z);
-                
-                planes[i] = new Plane(
-                    planes[i].Normal / length,
-                    planes[i].D / length
-                );
+                var p = planes[i];
+                var n = p.Normal;
+                var length = MathF.Sqrt(n.X * n.X + n.Y * n.Y + n.Z * n.Z);
+                if (length < eps) continue;
+                planes[i] = new Plane(n / length, p.D / length);
             }
-            
+
             return planes;
         }
-        
+
         private static bool IsBoxOutsidePlane(Vector3 min, Vector3 max, Plane plane)
         {
-            // Find the point of the box closest to the plane
-            Vector3 p = new(
-                plane.Normal.X > 0 ? min.X : max.X,
-                plane.Normal.Y > 0 ? min.Y : max.Y,
-                plane.Normal.Z > 0 ? min.Z : max.Z
+            // Pick the corner of the AABB that is most likely to be outside
+            Vector3 p = new Vector3(
+                plane.Normal.X >= 0 ? max.X : min.X,
+                plane.Normal.Y >= 0 ? max.Y : min.Y,
+                plane.Normal.Z >= 0 ? max.Z : min.Z
             );
-            
-            // If this point is outside the plane, the entire box is outside
-            return plane.Normal.X * p.X + plane.Normal.Y * p.Y + plane.Normal.Z * p.Z + plane.D < 0;
+
+            return Vector3.Dot(plane.Normal, p) + plane.D < 0;
         }
     }
 }
