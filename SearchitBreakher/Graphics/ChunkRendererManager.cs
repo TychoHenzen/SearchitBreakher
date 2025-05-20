@@ -89,21 +89,5 @@ namespace SearchitBreakher.Graphics
                 }
             }
         }
-
-        /// <summary>
-        /// Clears all chunk renderers.
-        /// </summary>
-        public void ClearRenderers()
-        {
-            _chunkRenderers.Clear();
-        }
-
-        /// <summary>
-        /// Removes a renderer for a specific chunk.
-        /// </summary>
-        public void RemoveRenderer(Vector3 chunkPosition)
-        {
-            _chunkRenderers.Remove(chunkPosition);
-        }
     }
 }

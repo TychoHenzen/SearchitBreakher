@@ -6,33 +6,20 @@ using Vector3 = System.Numerics.Vector3;
 
 namespace SearchitBreakher.Graphics
 {
-    public class ChunkRenderer
+    public class ChunkRenderer(GraphicsDevice graphicsDevice, ICamera camera)
     {
-        private readonly BasicEffect _basicEffect;
-        private readonly GraphicsDevice _graphicsDevice;
-        private ICamera _camera;
-        private VoxelChunk _currentChunk;
-        private int[] _indices;
-        private VertexPositionColor[] _vertices;
-
-        public ChunkRenderer(GraphicsDevice graphicsDevice, ICamera camera)
+        private readonly BasicEffect _basicEffect = new(graphicsDevice)
         {
-            _graphicsDevice = graphicsDevice;
-            _camera = camera;
+            VertexColorEnabled = true,
+            View = camera.GetViewMatrix(),
+            Projection = camera.GetProjectionMatrix(),
+            World = Matrix.Identity
+        };
 
-            // Create the effect
-            _basicEffect = new BasicEffect(graphicsDevice)
-            {
-                VertexColorEnabled = true,
-                View = camera.GetViewMatrix(),
-                Projection = camera.GetProjectionMatrix(),
-                World = Matrix.Identity
-            };
-
-            // Initialize with empty arrays
-            _vertices = [];
-            _indices = [];
-        }
+        private ICamera _camera = camera;
+        private VoxelChunk _currentChunk;
+        private int[] _indices = [];
+        private VertexPositionColor[] _vertices = [];
 
         public void SetChunk(VoxelChunk chunk)
         {
@@ -103,14 +90,14 @@ namespace SearchitBreakher.Graphics
             }
 
             // Set render state
-            _graphicsDevice.RasterizerState = new RasterizerState
+            graphicsDevice.RasterizerState = new RasterizerState
             {
                 CullMode = CullMode.CullCounterClockwiseFace, // Enable standard backface culling
                 FillMode = FillMode.Solid
             };
 
             // Ensure depth buffer is enabled for proper z-ordering
-            _graphicsDevice.DepthStencilState = new DepthStencilState
+            graphicsDevice.DepthStencilState = new DepthStencilState
             {
                 DepthBufferEnable = true,
                 DepthBufferFunction = CompareFunction.LessEqual
@@ -122,7 +109,7 @@ namespace SearchitBreakher.Graphics
                 pass.Apply();
 
                 // Draw the chunk using an index buffer
-                _graphicsDevice.DrawUserIndexedPrimitives(
+                graphicsDevice.DrawUserIndexedPrimitives(
                     PrimitiveType.TriangleList,
                     _vertices,
                     0, // vertex buffer offset

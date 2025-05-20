@@ -241,23 +241,12 @@ public class VoxelChunkManager : IChunkManager
     }
 
     /// <summary>
-    /// Creates directory for chunks if it doesn't exist.
-    /// </summary>
-    public void EnsureChunkDirectoryExists()
-    {
-        if (!string.IsNullOrEmpty(_chunkDirectory) && !Directory.Exists(_chunkDirectory))
-        {
-            Directory.CreateDirectory(_chunkDirectory);
-        }
-    }
-
-    /// <summary>
     /// Gets the chunk that contains the specified world position.
     /// </summary>
     public VoxelChunk? GetChunkAt(Vector3 worldPosition)
     {
         // Calculate the chunk position
-        Vector3 chunkPos = CalculateChunkPosition(worldPosition);
+        var chunkPos = CalculateChunkPosition(worldPosition);
 
         // Try to get the chunk, or load it if it's not loaded
         if (!_chunks.TryGetValue(chunkPos, out VoxelChunk? chunk))
