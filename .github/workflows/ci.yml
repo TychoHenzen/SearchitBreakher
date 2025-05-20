@@ -65,12 +65,10 @@ jobs:
             /p:CoverletOutputFormat=opencover `
             /p:CoverletOutput=TestResults/coverage/
 
-
-
       - name: Generate HTML coverage report
         run: |
           reportgenerator `
-            -reports:TestResults/coverage/coverage.opencover.xml `
+            -reports:SearchitTest/TestResults/coverage/coverage.opencover.xml `
             -targetdir:coverage-report `
             -reporttypes:Html
 
