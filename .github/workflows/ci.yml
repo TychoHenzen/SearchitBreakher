@@ -132,6 +132,7 @@ jobs:
         run: |
           mkdir -p mutation-pages
           mv mutation-report/*/reports/* mutation-pages/
+          cp mutation-report/cleartexttree.log mutation-pages/
       
       - name: Prepare site directory
         run: |
